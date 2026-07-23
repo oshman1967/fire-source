@@ -19,7 +19,7 @@
   :root {
     --ink: #1a1a1a;
     --ink-mid: #555;
-    --ink-light: #999;
+    --ink-light: #6b6b6b;
     --rule: #d8d2c8;
     --bg: #f9f7f4;
     --bg-white: #ffffff;
@@ -58,8 +58,8 @@
     display: block;
     filter: grayscale(0.1);
   }
-  .logo { font-family: 'Cormorant Garamond', 'Shippori Mincho', 'Yu Mincho', 'Hiragino Mincho ProN', serif; font-weight: 300; font-size: 1.5rem; letter-spacing: 0.12em; }
-  .logo span { font-style: italic; color: var(--accent); }
+  .logo { font-family: 'Cormorant Garamond', 'Shippori Mincho', 'Yu Mincho', 'Hiragino Mincho ProN', serif; font-weight: 300; font-size: 1.5rem; letter-spacing: 0.1em; }
+  .logo span { font-style: italic; color: var(--accent); white-space: nowrap; }
   .header-sub { font-size: 0.7rem; letter-spacing: 0.2em; color: var(--ink-light); text-transform: uppercase; }
 
   main { max-width: 820px; margin: 0 auto; padding: 4rem 2rem 6rem; }
@@ -360,6 +360,31 @@
     .cta-section { flex-direction: column; }
     .cta-buttons { width: 100%; }
     .btn-primary, .btn-secondary { text-align: center; }
+
+    .inf-table-tier thead { display: none; }
+    .inf-table-tier, .inf-table-tier tbody, .inf-table-tier tr, .inf-table-tier td {
+      display: block;
+      width: 100%;
+    }
+    .inf-table-tier tr {
+      padding: 1rem 0;
+      border-bottom: 0.5px solid var(--rule);
+    }
+    .inf-table-tier tr:last-child { border-bottom: none; }
+    .inf-table-tier td {
+      padding: 0.35rem 0;
+      border-bottom: none;
+    }
+    .inf-table-tier tr:nth-child(odd) td { background: transparent; }
+    .inf-table-tier td::before {
+      content: attr(data-label);
+      display: block;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-light);
+      margin-bottom: 0.2rem;
+    }
   }
 </style>
 </head>
@@ -446,7 +471,7 @@
   <!-- Influencer -->
   <div class="section">
     <p class="section-label">インフルエンサー構成（逆算設計）</p>
-    <table class="inf-table">
+    <table class="inf-table inf-table-tier">
       <thead>
         <tr>
           <th>ティア</th>
@@ -458,25 +483,25 @@
       </thead>
       <tbody>
         <tr>
-          <td><span class="tier-badge tier-core">コア</span></td>
-          <td>5〜20万人</td>
-          <td>5〜8人</td>
-          <td>信頼形成・UGC蓄積。エンゲージメント率が高く、フォロワーとの距離が近い。</td>
-          <td>15〜30万円</td>
+          <td data-label="ティア"><span class="tier-badge tier-core">コア</span></td>
+          <td data-label="フォロワー規模">5〜20万人</td>
+          <td data-label="人数">5〜8人</td>
+          <td data-label="役割">信頼形成・UGC蓄積。エンゲージメント率が高く、フォロワーとの距離が近い。</td>
+          <td data-label="1人あたり予算目安">15〜30万円</td>
         </tr>
         <tr>
-          <td><span class="tier-badge tier-mid">拡張</span></td>
-          <td>20〜50万人</td>
-          <td>2〜3人</td>
-          <td>認知拡大。コア層での実績ができてから投入する。</td>
-          <td>50〜80万円</td>
+          <td data-label="ティア"><span class="tier-badge tier-mid">拡張</span></td>
+          <td data-label="フォロワー規模">20〜50万人</td>
+          <td data-label="人数">2〜3人</td>
+          <td data-label="役割">認知拡大。コア層での実績ができてから投入する。</td>
+          <td data-label="1人あたり予算目安">50〜80万円</td>
         </tr>
         <tr>
-          <td style="color:var(--ink-light)">非推奨</td>
-          <td style="color:var(--ink-light)">100万人以上</td>
-          <td style="color:var(--ink-light)">0人</td>
-          <td style="color:var(--ink-light)">新規ブランドの信頼が形成される前に使うと逆効果。最低6ヶ月以降に再検討。</td>
-          <td style="color:var(--ink-light)">—</td>
+          <td data-label="ティア" style="color:var(--ink-light)">非推奨</td>
+          <td data-label="フォロワー規模" style="color:var(--ink-light)">100万人以上</td>
+          <td data-label="人数" style="color:var(--ink-light)">0人</td>
+          <td data-label="役割" style="color:var(--ink-light)">新規ブランドの信頼が形成される前に使うと逆効果。最低6ヶ月以降に再検討。</td>
+          <td data-label="1人あたり予算目安" style="color:var(--ink-light)">—</td>
         </tr>
       </tbody>
     </table>
