@@ -71,7 +71,7 @@
 
   .plans {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 1.75rem;
   }
 
@@ -83,7 +83,6 @@
     display: flex;
     flex-direction: column;
   }
-  .plan-card.featured { border-color: var(--ink); }
 
   .plan-label {
     font-size: 0.62rem;
@@ -255,7 +254,8 @@
   }
 
   @media (max-width: 700px) {
-    header { padding: 1.25rem 1.5rem; }
+    header { padding: 1.25rem 1.5rem;  flex-wrap: wrap; }
+    .pr-badge { order: 3; margin-top: 0.4rem; }
     main { padding: 2.5rem 1.25rem 4rem; }
     .page-title { font-size: 2rem; }
     .plans { grid-template-columns: 1fr; }
@@ -267,6 +267,7 @@
 <header>
   <div class="logo"><a href="trend_fire_source_top.html">Trend<span> Fire Source</span></a></div>
   <div class="header-sub">Plan Selection</div>
+  <a href="plan_selection.html#press-release" class="pr-badge" style="display:inline-block; font-size:0.7rem; letter-spacing:0.03em; border:1px solid currentColor; border-radius:20px; padding:0.4rem 0.9rem; text-decoration:none; color:inherit; white-space:nowrap;">プレスリリース制作のみはこちら</a>
 </header>
 
 <main>
@@ -291,7 +292,7 @@
       <button class="plan-btn" onclick="openConsent('a')">このプランで申し込む →</button>
     </div>
 
-    <div class="plan-card featured">
+    <div class="plan-card">
       <p class="plan-label">Plan B</p>
       <h2 class="plan-name">分析＋実行支援（タレント・制作選定／ブッキング）</h2>
       <p class="plan-price">¥300,000<span> 〜</span></p>
@@ -303,6 +304,18 @@
         <li>ブッキングまでの実行支援</li>
       </ul>
       <button class="plan-btn" onclick="openConsent('b')">このプランで申し込む →</button>
+    </div>
+
+    <div class="plan-card" id="press-release">
+      <p class="plan-label">プレスリリース制作・配信サービス</p>
+      <h2 class="plan-name">プレスリリース制作・配信サービス</h2>
+      <p class="plan-note">診断とは独立してご利用いただける単体サービスです。Claude APIによる自動作成に加え、ご希望の場合は既存メディアネットワークへの配信まで対応します。</p>
+      <ul class="plan-includes">
+        <li><b>①作成・DLのみ</b> — プレスリリース文面を自動作成し、データでお渡しします</li>
+        <li><b>②作成・配信サービス付き</b> — ①に加え、粧業日報・WWD BEAUTY等への配信まで対応します</li>
+      </ul>
+      <a class="plan-btn" style="text-decoration:none; display:block; text-align:center;" href="pr_release_input.html?tier=1">①作成・DLのみを申し込む →</a>
+      <a class="plan-btn" style="text-decoration:none; display:block; text-align:center; margin-top:0.6rem;" href="pr_release_input.html?tier=2">②作成・配信付きを申し込む →</a>
     </div>
   </div>
 
@@ -360,6 +373,8 @@
       window.location.href = 'complete_plan_a.html';
     } else if (pendingPlan === 'b') {
       window.location.href = 'complete_plan_b.html';
+    } else if (pendingPlan === 'pr1' || pendingPlan === 'pr2') {
+      window.location.href = 'complete_pr.html';
     }
   }
 </script>

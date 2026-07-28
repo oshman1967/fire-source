@@ -165,6 +165,46 @@
   }
   .verdict-text p { font-size: 0.78rem; line-height: 1.8; color: #bbb; }
 
+  /* Persona callout */
+  .persona-callout {
+    background: var(--bg-white);
+    border: 1.5px solid var(--accent);
+    border-radius: 2px;
+    padding: 1.8rem 2.2rem;
+    margin-bottom: 3rem;
+  }
+  .persona-label {
+    font-family: 'IBM Plex Mono', 'Cormorant Garamond', serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+  }
+  .persona-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.2rem;
+  }
+  .persona-card {
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 1.1rem 1.2rem;
+  }
+  .persona-tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 2px;
+    padding: 0.15rem 0.5rem;
+    margin-bottom: 0.6rem;
+  }
+  .persona-card p.persona-desc { font-size: 0.82rem; line-height: 1.65; color: var(--ink); }
+  .persona-note { font-size: 0.72rem; color: var(--ink-light); margin-top: 1.1rem; }
+
   /* Media grid */
   .media-grid {
     display: grid;
@@ -349,7 +389,8 @@
   }
 
   @media (max-width: 640px) {
-    header { padding: 1.25rem 1.5rem; }
+    header { padding: 1.25rem 1.5rem;  flex-wrap: wrap; }
+    .pr-badge { order: 3; margin-top: 0.4rem; }
     main { padding: 2.5rem 1.25rem 4rem; }
     .report-header { flex-direction: column; gap: 1rem; }
     .report-meta { text-align: left; }
@@ -358,6 +399,7 @@
     .brief-item:last-child { border-bottom: none; }
     .media-grid { grid-template-columns: 1fr; }
     .verdict { flex-direction: column; gap: 1rem; }
+    .persona-grid { grid-template-columns: 1fr; }
     .cta-section { flex-direction: column; }
     .cta-buttons { width: 100%; }
     .btn-primary, .btn-secondary { text-align: center; }
@@ -394,6 +436,7 @@
 <header>
   <div class="logo"><a href="trend_fire_source_top.html" style="text-decoration:none; color:inherit;">Trend<span> Fire Source</span></a></div>
   <div class="header-sub">Analysis Report</div>
+  <a href="plan_selection.html#press-release" class="pr-badge" style="display:inline-block; font-size:0.7rem; letter-spacing:0.03em; border:1px solid currentColor; border-radius:20px; padding:0.4rem 0.9rem; text-decoration:none; color:inherit; white-space:nowrap;">プレスリリース制作のみはこちら</a>
 </header>
 
 <main>
@@ -442,6 +485,26 @@
       <h2>予算・ロットのバランスは良好。ただし新規ブランドリスクあり。</h2>
       <p>生産ロットに対してPR予算は適切な水準です。ただし新規ブランドのため、認知獲得より先に「信頼の形成」を優先する設計が必要です。メガインフルエンサーへの集中投下は、このフェーズでは非推奨です。</p>
     </div>
+  </div>
+
+  <!-- Persona callout -->
+  <div class="persona-callout">
+    <p class="persona-label">こんなインフルエンサーがベスト</p>
+    <div class="persona-grid">
+      <div class="persona-card">
+        <div class="persona-tag">コア</div>
+        <p class="persona-desc">30代女性、丁寧な暮らし系アカウントにファンを持つ層。エンゲージメント重視。</p>
+      </div>
+      <div class="persona-card">
+        <div class="persona-tag">コア</div>
+        <p class="persona-desc">20代後半女性、韓国系ファッション・美容にファンを持つ層。新規ブランド紹介への反応率が高い。</p>
+      </div>
+      <div class="persona-card">
+        <div class="persona-tag">拡張</div>
+        <p class="persona-desc">30代女性、働く女性のライフスタイル提案にファンを持つ層。認知拡大フェーズで投入。</p>
+      </div>
+    </div>
+    <p class="persona-note">※実在の個人・事務所名の指定はPlan B（ブッキング支援）でご案内します。</p>
   </div>
 
   <!-- Media -->

@@ -210,7 +210,8 @@
   }
 
   @media (max-width: 640px) {
-    header { padding: 1.25rem 1.5rem; }
+    header { padding: 1.25rem 1.5rem;  flex-wrap: wrap; }
+    .pr-badge { order: 3; margin-top: 0.4rem; }
     .hero { height: 78vh; min-height: 480px; }
     .hero-text { padding: 0 1.5rem 2.5rem; }
     .steps { grid-template-columns: 1fr; gap: 2.5rem; }
@@ -223,6 +224,7 @@
 <header>
   <div class="logo">Trend<span> Fire Source</span></div>
   <div class="header-sub">Marketing Design</div>
+  <a href="plan_selection.html#press-release" class="pr-badge" style="display:inline-block; font-size:0.7rem; letter-spacing:0.03em; border:1px solid currentColor; border-radius:20px; padding:0.4rem 0.9rem; text-decoration:none; color:inherit; white-space:nowrap;">プレスリリース制作のみはこちら</a>
 </header>
 
 <div class="hero">
@@ -283,7 +285,7 @@
   <div class="cta-note" style="margin-top:1rem;">クレジットカード登録不要 ／ 分析結果はその場で確認できます</div>
 </div>
 
-<footer>これは社内確認用のUXプロトタイプです。</footer>
+
 
 </body>
 </html>
