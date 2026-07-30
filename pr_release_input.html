@@ -421,6 +421,7 @@
     </div>
   </div>
 
+  <p id="tierPriceNote" style="text-align:center; font-size:0.8rem; color:var(--ink-mid); margin-bottom:1rem;"></p>
   <button class="submit-btn" id="submitBtn" style="border:none; cursor:pointer;" onclick="openConsent(window.__prTier || 'pr1')">この内容で申し込む →</button>
 
 </main>
@@ -449,6 +450,8 @@
 <script>
   var params = new URLSearchParams(window.location.search);
   window.__prTier = params.get('tier') === '2' ? 'pr2' : 'pr1';
+  document.getElementById('tierPriceNote').textContent =
+    window.__prTier === 'pr2' ? '選択プラン：②作成・配信サービス付き　¥100,000' : '選択プラン：①作成・DLのみ　¥50,000';
 
   var pendingPlan = null;
   var modal = document.getElementById('consentModal');
