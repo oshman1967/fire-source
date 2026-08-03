@@ -62,12 +62,15 @@
     object-fit: cover;
     object-position: top center;
     display: block;
-    filter: grayscale(0.1) blur(14px);
+    filter: grayscale(1) blur(14px);
     transform: scale(1.08);
-    animation: heroFocusIn 5s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+    animation: heroRevealIn 6s ease-in-out 0.4s forwards;
   }
-  @keyframes heroFocusIn {
-    to { filter: grayscale(0.1) blur(0px); transform: scale(1); }
+  @keyframes heroRevealIn {
+    0%   { filter: grayscale(1) blur(14px); transform: scale(1.08); }
+    45%  { filter: grayscale(0.6) blur(2px); transform: scale(1.02); }
+    80%  { filter: grayscale(0.05) blur(0px); transform: scale(1); }
+    100% { filter: grayscale(0) blur(0px); transform: scale(1); }
   }
   .hero-media::after {
     content: '';
