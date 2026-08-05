@@ -449,9 +449,8 @@
 
 <script>
   var params = new URLSearchParams(window.location.search);
-  window.__prTier = params.get('tier') === '2' ? 'pr2' : 'pr1';
-  document.getElementById('tierPriceNote').textContent =
-    window.__prTier === 'pr2' ? '選択プラン：②作成・配信サービス付き　¥100,000' : '選択プラン：①作成・DLのみ　¥50,000';
+  window.__prTier = 'pr1';
+  document.getElementById('tierPriceNote').textContent = '選択プラン：プレスリリース制作　¥50,000';
 
   var pendingPlan = null;
   var modal = document.getElementById('consentModal');
