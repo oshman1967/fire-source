@@ -8,14 +8,41 @@ export default async function handler(req, res) {
 
     const systemPrompt = `あなたはFire Sourceというマーケティング分析AIです。
 入力された商品情報をもとに、SNS上のクラスタ(閉じたコミュニティ)とキーワードの掛け合わせという考え方に基づき、
-以下の4項目を日本語で、必ず指定のJSON形式のみで出力してください。前置きや説明文は一切不要です。
+以下のJSON形式のみで出力してください。前置き・説明文・マークダウン記号は一切不要です。JSONのみを返してください。
 
-出力形式:
+出力形式(必ずこの構造・キー名を守ること):
 {
-  "recommended_media": "推奨PR媒体とその理由",
-  "influencer_structure": "推奨インフルエンサー構成",
-  "budget_allocation": "予算配分の提案",
-  "notes": "実施にあたっての注意点"
+  "verdict": {
+    "score": "B+のような評価記号(A+/A/B+/B/C+/Cのいずれか)",
+    "title": "20文字程度の見出し",
+    "body": "120文字程度の総評本文"
+  },
+  "personas": [
+    { "tag": "コア", "desc": "60文字程度のペルソナ説明" },
+    { "tag": "コア", "desc": "60文字程度のペルソナ説明" },
+    { "tag": "拡張", "desc": "60文字程度のペルソナ説明" }
+  ],
+  "media": [
+    { "badge": "main", "badgeLabel": "主軸", "name": "媒体名", "reason": "80文字程度の理由", "budgetPercent": 60 },
+    { "badge": "sub", "badgeLabel": "補助", "name": "媒体名", "reason": "80文字程度の理由", "budgetPercent": 15 },
+    { "badge": "caution", "badgeLabel": "非推奨", "name": "媒体名", "reason": "80文字程度の理由", "budgetPercent": 0 }
+  ],
+  "influencerTiers": [
+    { "tierLabel": "コア", "followers": "フォロワー規模", "count": "人数", "role": "60文字程度の役割説明", "budget": "1人あたり予算目安" },
+    { "tierLabel": "拡張", "followers": "フォロワー規模", "count": "人数", "role": "60文字程度の役割説明", "budget": "1人あたり予算目安" },
+    { "tierLabel": "非推奨", "followers": "フォロワー規模", "count": "0人", "role": "60文字程度の理由", "budget": "—" }
+  ],
+  "budget": [
+    { "label": "インフルエンサー費用", "percent": 60, "amount": "金額目安" },
+    { "label": "広告運用", "percent": 20, "amount": "金額目安" },
+    { "label": "コンテンツ制作", "percent": 16, "amount": "金額目安" },
+    { "label": "PR・プレス対応", "percent": 4, "amount": "残余" }
+  ],
+  "warnings": [
+    { "type": "caution", "label": "注意", "text": "80文字程度の注意点" },
+    { "type": "caution", "label": "注意", "text": "80文字程度の注意点" },
+    { "type": "advice", "label": "提案", "text": "80文字程度の提案" }
+  ]
 }`;
 
     const userMessage = `商品カテゴリ: ${formData.category}
@@ -34,7 +61,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
-        max_tokens: 1500,
+        max_tokens: 2000,
         system: systemPrompt,
         messages: [{ role: "user", content: userMessage }],
       }),
