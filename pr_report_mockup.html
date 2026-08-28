@@ -479,18 +479,18 @@
   </div>
 
   <!-- Verdict -->
-  <div class="verdict">
-    <div class="verdict-score">B<span>+</span></div>
-    <div class="verdict-text">
-      <h2>予算・ロットのバランスは良好。<br>ただしブランドイメージのリスクあり。</h2>
-      <p>生産ロットに対してPR予算は適切な水準です。ただし既存ブランドのため、新規認知獲得より先に「信頼の形成」を破壊しない設計が必要です。メガインフルエンサーへの集中投下は、このフェーズではまだ時期尚早であり、非推奨です。</p>
+    <div class="verdict">
+    <div class="verdict-score" id="verdict-score">B<span>+</span></div>
+        <div class="verdict-text">
+      <h2 id="verdict-title">予算・ロットのバランスは良好。<br>ただしブランドイメージのリスクあり。</h2>
+      <p id="verdict-body">生産ロットに対してPR予算は適切な水準です。ただし既存ブランドのため、新規認知獲得より先に「信頼の形成」を破壊しない設計が必要です。メガインフルエンサーへの集中投下は、このフェーズではまだ時期尚早であり、非推奨です。</p>
     </div>
   </div>
 
   <!-- Persona callout -->
   <div class="persona-callout">
     <p class="persona-label">こんなインフルエンサーがベスト</p>
-    <div class="persona-grid">
+    　 <div class="persona-grid" id="persona-grid">
       <div class="persona-card">
         <div class="persona-tag">コア</div>
         <p class="persona-desc">30代女性、丁寧な暮らし系アカウントにファンを持つ層。エンゲージメント重視。</p>
@@ -510,7 +510,7 @@
   <!-- Media -->
   <div class="section">
     <p class="section-label">推奨媒体</p>
-    <div class="media-grid">
+      <div class="media-grid" id="media-grid">
       <div class="media-card primary">
         <div class="media-badge main">主軸</div>
         <div class="media-name">Instagram</div>
@@ -545,7 +545,7 @@
           <th>1人あたり予算目安</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="inf-tbody">
         <tr>
           <td data-label="ティア"><span class="tier-badge tier-core">コア</span></td>
           <td data-label="フォロワー規模">5〜20万人</td>
@@ -574,7 +574,7 @@
   <!-- Budget breakdown -->
   <div class="section">
     <p class="section-label">予算配分（月200〜500万円）</p>
-    <div class="budget-breakdown">
+      <div class="budget-breakdown" id="budget-breakdown">
       <div class="budget-row">
         <div class="budget-row-label">インフルエンサー費用</div>
         <div class="budget-bar-wrap"><div class="budget-bar" style="width:60%"></div></div>
@@ -601,7 +601,7 @@
   <!-- Warnings -->
   <div class="section">
     <p class="section-label">注意点・アドバイス</p>
-    <div class="warning-list">
+    <div class="warning-list" id="warning-list">
       <div class="warning-item">
         <div class="warning-icon">注意</div>
         <div class="warning-text">最初から大きく打たない。メガインフルエンサー1人に全予算を集中すると、在庫切れとブランド信頼の未形成が同時に起きる最悪のパターンになります。</div>
@@ -647,6 +647,76 @@
   </div>
 
 </main>
+<script>
+(function() {
+  const raw = sessionStorage.getItem("fireSourceReport");
+  if (!raw) return;
+  let r;
+  try { r = JSON.parse(raw); } catch (e) { return; }
+  if (!r.verdict) return;
 
+  // verdict
+  document.getElementById("verdict-score").innerHTML = r.verdict.score.replace(/\+/g, "<span>+</span>");
+  document.getElementById("verdict-title").textContent = r.verdict.title;
+  document.getElementById("verdict-body").textContent = r.verdict.body;
+
+  // personas
+  const personaGrid = document.getElementById("persona-grid");
+  personaGrid.innerHTML = r.personas.map(p => `
+    <div class="persona-card">
+      <div class="persona-tag">${p.tag}</div>
+      <p class="persona-desc">${p.desc}</p>
+    </div>
+  `).join("");
+
+  // media
+  const mediaGrid = document.getElementById("media-grid");
+  mediaGrid.innerHTML = r.media.map(m => `
+    <div class="media-card ${m.badge === "main" ? "primary" : ""}">
+      <div class="media-badge ${m.badge}">${m.badgeLabel}</div>
+      <div class="media-name">${m.name}</div>
+      <div class="media-reason">${m.reason}</div>
+      <div class="media-budget">予算配分：${m.budgetPercent}%</div>
+    </div>
+  `).join("");
+
+  // influencer tiers
+  const infTbody = document.getElementById("inf-tbody");
+  infTbody.innerHTML = r.influencerTiers.map(t => {
+    const tierClass = t.tierLabel === "コア" ? "tier-core" : (t.tierLabel === "拡張" ? "tier-mid" : "");
+    const dim = t.tierLabel === "非推奨" ? 'style="color:var(--ink-light)"' : "";
+    const badge = tierClass ? `<span class="tier-badge ${tierClass}">${t.tierLabel}</span>` : t.tierLabel;
+    return `
+      <tr>
+        <td data-label="ティア" ${dim}>${badge}</td>
+        <td data-label="フォロワー規模" ${dim}>${t.followers}</td>
+        <td data-label="人数" ${dim}>${t.count}</td>
+        <td data-label="役割" ${dim}>${t.role}</td>
+        <td data-label="1人あたり予算目安" ${dim}>${t.budget}</td>
+      </tr>
+    `;
+  }).join("");
+
+  // budget
+  const budgetColors = ["var(--accent)", "#c9b49a", "#d8d2c8", "#ebe7e2"];
+  const budgetBreakdown = document.getElementById("budget-breakdown");
+  budgetBreakdown.innerHTML = r.budget.map((b, i) => `
+    <div class="budget-row">
+      <div class="budget-row-label">${b.label}</div>
+      <div class="budget-bar-wrap"><div class="budget-bar" style="width:${b.percent}%; background:${budgetColors[i] || "var(--accent)"}"></div></div>
+      <div class="budget-amount">${b.amount}</div>
+    </div>
+  `).join("");
+
+  // warnings
+  const warningList = document.getElementById("warning-list");
+  warningList.innerHTML = r.warnings.map(w => `
+    <div class="warning-item ${w.type === "advice" ? "advice" : ""}">
+      <div class="warning-icon" ${w.type === "advice" ? 'style="color:var(--green)"' : ""}>${w.label}</div>
+      <div class="warning-text">${w.text}</div>
+    </div>
+  `).join("");
+})();
+</script>
 </body>
 </html>
