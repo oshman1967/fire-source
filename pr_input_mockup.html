@@ -393,11 +393,11 @@
     <p class="section-label">ブランド・ターゲット</p>
     <div class="field">
       <label>ブランドイメージ・ターゲット層</label>
-      <textarea placeholder="例：30代女性向け。高級感があるが親しみやすい。健康意識が高く、情報感度の高いアーリーアダプター層を狙いたい。">30代女性。高級感</textarea>
+      <textarea id="brand-textarea" placeholder="例：30代女性向け。高級感があるが親しみやすい。健康意識が高く、情報感度の高いアーリーアダプター層を狙いたい。">30代女性。高級感</textarea>
     </div>
     <div class="field" style="margin-top:1rem">
       <label>補足・背景（任意）</label>
-      <textarea placeholder="例：長く続くブランドだが、これまでとは違う層にも届けたい。差別化ポイントは素材へのこだわり。">20年以上続いたブランドなのだが、新しいマーケット開発の必要を感じている</textarea>
+      <te<textarea id="notes-textarea" placeholder="例：長く続くブランドだが、これまでとは違う層にも届けたい。差別化ポイントは素材へのこだわり。">20年以上続いたブランドなのだが、新しいマーケット開発の必要を感じている</textarea>
     </div>
   </div>
 
@@ -413,7 +413,36 @@
     <p class="submit-note">
       入力内容をもとに、推奨媒体・インフルエンサー構成・予算配分の設計レポートを生成します。所要時間：約30秒
     </p>
-    <a href="pr_report_mockup.html" class="submit-btn" style="text-decoration:none; display:inline-block;">分析を開始する →</a>
+        <button id="analyzeBtn" class="submit-btn" style="border:none; cursor:pointer;">分析を開始する →</button>
+    <div id="loadingMsg" style="display:none; font-size:0.75rem; color:var(--ink-light); margin-top:0.75rem;">解析中です…(約30秒)</div>
+
+    <script>
+    document.getElementById("analyzeBtn").addEventListener("click", async () => {
+      document.getElementById("loadingMsg").style.display = "block";
+
+      const formData = {
+        category: document.getElementById("category-select").value,
+        priceRange: document.getElementById("price-select").value,
+        productionLot: document.querySelector('input[name="lot"]:checked')?.nextElementSibling.textContent || "",
+        budget: document.querySelector('input[name="budget"]:checked')?.nextElementSibling.textContent || "",
+        brandImage: document.getElementById("brand-textarea").value,
+        notes: document.getElementById("notes-textarea").value,
+      };
+
+      try {
+        const res = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+        const report = await res.json();
+        sessionStorage.setItem("fireSourceReport", JSON.stringify(report));
+        window.location.href = "pr_report_mockup.html";
+      } catch (err) {
+        document.getElementById("loadingMsg").textContent = "エラーが発生しました。もう一度お試しください。";
+      }
+    });
+    </script>
   </div>
 
 </main>
