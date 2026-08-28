@@ -437,6 +437,7 @@
         });
         const report = await res.json();
         sessionStorage.setItem("fireSourceReport", JSON.stringify(report));
+        sessionStorage.setItem("fireSourceFormData", JSON.stringify(formData));
         window.location.href = "pr_report_mockup.html";
       } catch (err) {
         document.getElementById("loadingMsg").textContent = "エラーが発生しました。もう一度お試しください。";
