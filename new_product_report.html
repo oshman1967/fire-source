@@ -464,35 +464,35 @@
       <div class="brief-item-label">ご相談</div>
       <div class="brief-item-value">新商品のアイデア</div>
     </div>
-    <div class="brief-item">
+        <div class="brief-item">
       <div class="brief-item-label">現在の事業</div>
-      <div class="brief-item-value">韓国コスメの輸入販売</div>
+      <div class="brief-item-value" id="brief-business">韓国コスメの輸入販売</div>
     </div>
     <div class="brief-item">
       <div class="brief-item-label">自社製品</div>
       <div class="brief-item-value">なし</div>
     </div>
-    <div class="brief-item">
+        <div class="brief-item">
       <div class="brief-item-label">狙いたい領域</div>
-      <div class="brief-item-value">未定・提案を希望</div>
+      <div class="brief-item-value" id="brief-market">未定・提案を希望</div>
     </div>
   </div>
 
   <!-- Verdict -->
-  <div class="verdict">
-    <div class="verdict-score">A<span>-</span></div>
+    <div class="verdict">
+    <div class="verdict-score" id="verdict-score">A<span>-</span></div>
     <div class="verdict-text">
-      <h2>商品を持たないことが弱みではなく、資産が眠っている状態です。</h2>
-      <p>御社が本当に持っているのは商品ではなく、「どれが本当に良いかを見分けてきた目利き」と「なぜそれが良いかを説明できる現地知識」です。輸入販売ではこれが仕入れ判断という社内利用に留まり、利益になっていません。ここが頭打ちの構造的な原因です。</p>
+      <h2 id="verdict-title">商品を持たないことが弱みではなく、資産が眠っている状態です。</h2>
+      <p id="verdict-body">御社が本当に持っているのは商品ではなく、「どれが本当に良いかを見分けてきた目利き」と「なぜそれが良いかを説明できる現地知識」です。輸入販売ではこれが仕入れ判断という社内利用に留まり、利益になっていません。ここが頭打ちの構造的な原因です。</p>
     </div>
   </div>
 
   <!-- 01 検知した兆候 -->
   <div class="section">
     <p class="section-label">01 — 検知した兆候</p>
-    <div class="persona-callout">
+        <div class="persona-callout">
       <p class="persona-label">言語化される前の変化</p>
-      <div class="persona-grid">
+      <div class="persona-grid" id="signal-grid">
         <div class="persona-card">
           <div class="persona-tag">移行</div>
           <p class="persona-desc">「どの韓国コスメを買うか」という商品選びの話から、「韓国の人がなぜそうしているのか」という<b>手順・考え方</b>への関心に移行しつつある。</p>
@@ -521,7 +521,7 @@
           <th>兆候との接点</th>
         </tr>
       </thead>
-      <tbody>
+            <tbody id="strengths-tbody">
         <tr>
           <td data-label="御社の資産"><span class="tier-badge tier-core">目利き</span></td>
           <td data-label="これまでの使われ方">仕入れ判断（社内利用のみ）</td>
@@ -548,8 +548,8 @@
 
   <!-- 03 商品コンセプト案 -->
   <div class="section">
-    <p class="section-label">03 — 商品コンセプト案</p>
-    <div class="media-grid">
+        <p class="section-label">03 — 商品コンセプト案</p>
+    <div class="media-grid" id="concept-grid">
       <div class="media-card">
         <div class="media-badge badge-rec">A案</div>
         <h3>編集された「順番」を売る</h3>
@@ -575,8 +575,8 @@
   <div class="section">
     <p class="section-label">04 — 想定されるターゲット像</p>
     <div class="persona-callout">
-      <p class="persona-label">この商品を待っている層</p>
-      <div class="persona-grid">
+       <p class="persona-label">この商品を待っている層</p>
+      <div class="persona-grid" id="target-persona-grid">
         <div class="persona-card">
           <div class="persona-tag">中核</div>
           <p class="persona-desc">20代後半〜30代女性。韓国コスメを一通り試したが、選択肢が増えすぎて自分に合うものが分からなくなっている。</p>
@@ -624,6 +624,68 @@
   </div>
 
 </main>
+<script>
+(function() {
+  const raw = sessionStorage.getItem("fireSourceNewProductReport");
+  if (!raw) return;
+  let r;
+  try { r = JSON.parse(raw); } catch (e) { return; }
+  if (!r.verdict) return;
 
+  // brief summary
+  const formRaw = sessionStorage.getItem("fireSourceNewProductFormData");
+  if (formRaw) {
+    try {
+      const f = JSON.parse(formRaw);
+      document.getElementById("brief-business").textContent = f.business || "—";
+      document.getElementById("brief-market").textContent = f.targetMarket || "—";
+    } catch (e) {}
+  }
+
+  // verdict
+  document.getElementById("verdict-score").innerHTML = r.verdict.score.replace(/([+-])/g, "<span>$1</span>");
+  document.getElementById("verdict-title").textContent = r.verdict.title;
+  document.getElementById("verdict-body").textContent = r.verdict.body;
+
+  // 01 signals
+  const signalGrid = document.getElementById("signal-grid");
+  signalGrid.innerHTML = r.signals.map(s => `
+    <div class="persona-card">
+      <div class="persona-tag">${s.tag}</div>
+      <p class="persona-desc">${s.desc}</p>
+    </div>
+  `).join("");
+
+  // 02 strengths
+  const strengthsTbody = document.getElementById("strengths-tbody");
+  strengthsTbody.innerHTML = r.strengths.map(s => `
+    <tr>
+      <td data-label="御社の資産"><span class="tier-badge tier-core">${s.tag}</span></td>
+      <td data-label="これまでの使われ方">${s.usage}</td>
+      <td data-label="兆候との接点">${s.connection}</td>
+    </tr>
+  `).join("");
+
+  // 03 concepts
+  const conceptGrid = document.getElementById("concept-grid");
+  conceptGrid.innerHTML = r.concepts.map(c => `
+    <div class="media-card">
+      <div class="media-badge badge-rec">${c.badge}</div>
+      <h3>${c.title}</h3>
+      <p>${c.desc}</p>
+      <p class="media-budget">${c.impact}</p>
+    </div>
+  `).join("");
+
+  // 04 target personas
+  const targetGrid = document.getElementById("target-persona-grid");
+  targetGrid.innerHTML = r.personas.map(p => `
+    <div class="persona-card">
+      <div class="persona-tag">${p.tag}</div>
+      <p class="persona-desc">${p.desc}</p>
+    </div>
+  `).join("");
+})();
+</script>
 </body>
 </html>
