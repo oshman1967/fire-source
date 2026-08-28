@@ -430,8 +430,36 @@
     </div>
   </div>
 
-  <a href="new_product_report.html" class="submit-btn" style="text-decoration:none; display:inline-block;">分析を開始する →</a>
+    <button id="analyzeBtn" class="submit-btn" style="border:none; cursor:pointer;">分析を開始する →</button>
+  <div id="loadingMsg" style="display:none; font-size:0.75rem; color:var(--ink-light); margin-top:0.75rem;">解析中です…(約30秒)</div>
 
+  <script>
+  document.getElementById("analyzeBtn").addEventListener("click", async () => {
+    document.getElementById("loadingMsg").style.display = "block";
+
+    const formData = {
+      business: document.getElementById("business").value,
+      assets: document.getElementById("assets").value,
+      targetMarket: document.getElementById("targetMarket").value,
+      scale: document.getElementById("scale").value,
+      mustDo: document.getElementById("mustDo").value,
+    };
+
+    try {
+      const res = await fetch("/api/new_product", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const report = await res.json();
+      sessionStorage.setItem("fireSourceNewProductReport", JSON.stringify(report));
+      sessionStorage.setItem("fireSourceNewProductFormData", JSON.stringify(formData));
+      window.location.href = "new_product_report.html";
+    } catch (err) {
+      document.getElementById("loadingMsg").textContent = "エラーが発生しました。もう一度お試しください。";
+    }
+  });
+  </script>
 </main>
 
 
