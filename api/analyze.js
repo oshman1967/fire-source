@@ -126,4 +126,57 @@ SNS上で兆候が生まれる場所は、漠然とした「生活者」では�
   ],
   "media": [
     { "badge": "main", "badgeLabel": "主軸", "name": "Instagram", "reason": "専門家系の発信媒体として定着しており、質感・発色の伝達に強い。リール中心で運用。", "budgetPercent": 55 },
-    { "badge": "sub", "badgeLabel":
+    { "badge": "sub", "badgeLabel": "補助", "name": "美容師向けコミュニティ(業界内SNS・展示会)", "reason": "専門家系発見層に直接アプローチできる、規模は小さいが精度の高いチャネル。", "budgetPercent": 20 },
+    { "badge": "caution", "badgeLabel": "非推奨", "name": "テレビCM", "reason": "専門家層の評価が定まる前の大規模露出は、ブランドの信頼形成を追い越してしまう。", "budgetPercent": 0 }
+  ],
+  "influencerTiers": [
+    { "tierLabel": "コア", "followers": "1〜10万人", "count": "6〜10人", "role": "専門家系の美容師・メイクアップアーティストを中心に起用し、技術的な評価を先に固める。", "budget": "10〜25万円" },
+    { "tierLabel": "拡張", "followers": "10〜30万人", "count": "2〜3人", "role": "専門家層での評価が固まった後、キラキラ系・生活者系への波及を狙う。", "budget": "30〜60万円" },
+    { "tierLabel": "非推奨", "followers": "50万人以上", "count": "0人", "role": "専門家系の評価前に投入すると、単なる話題消費で終わる。", "budget": "—" }
+  ],
+  "budget": [
+    { "label": "インフルエンサー費用", "percent": 55, "amount": "28〜110万円" },
+    { "label": "広告運用", "percent": 20, "amount": "10〜40万円" },
+    { "label": "コンテンツ制作", "percent": 20, "amount": "10〜40万円" },
+    { "label": "PR・プレス対応", "percent": 5, "amount": "残余" }
+  ],
+  "warnings": [
+    { "type": "caution", "label": "注意", "text": "専門家系の評価を飛ばして一般層に広告を打つと、ブランドの専門性の裏付けがないまま消費されて終わる。" },
+    { "type": "caution", "label": "注意", "text": "韓国コスメは競合が多いカテゴリのため、発色・質感以外の独自の切り口が語られていないと埋没する。" },
+    { "type": "advice", "label": "提案", "text": "最初の1〜2ヶ月は専門家系向けのクローズドな体験会を実施し、そこでの評価コメントを二次利用する設計が有効。" }
+  ]
+}`;
+
+    const userMessage = `商品カテゴリ: ${formData.category}
+価格帯: ${formData.priceRange}
+月間生産ロット: ${formData.productionLot}
+月間PR予算: ${formData.budget}
+ブランドイメージ・ターゲット層: ${formData.brandImage}
+補足: ${formData.notes || "なし"}${snsNote}`;
+
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 2500,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userMessage }],
+      }),
+    });
+
+    const data = await response.json();
+    const rawText = data.content?.[0]?.text || "{}";
+    const cleaned = rawText.replace(/```json|```/g, "").trim();
+    const report = JSON.parse(cleaned);
+
+    return res.status(200).json(report);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "分析中にエラーが発生しました" });
+  }
+}
