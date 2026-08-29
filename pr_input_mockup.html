@@ -409,12 +409,13 @@
     </div>
   </div>
 
-  <div class="submit-area">
+    <div class="submit-area">
     <p class="submit-note">
       入力内容をもとに、推奨媒体・インフルエンサー構成・予算配分の設計レポートを生成します。所要時間：約30秒
     </p>
         <button id="analyzeBtn" class="submit-btn" style="border:none; cursor:pointer;">分析を開始する →</button>
-    <div id="loadingMsg" style="display:none; font-size:0.75rem; color:var(--ink-light); margin-top:0.75rem;">解析中です…(約30秒)</div>
+  </div>
+  <div id="loadingMsg" style="display:none; font-size:0.75rem; color:var(--ink-light); margin-top:0.75rem; text-align:right;">解析中です…(約30秒)</div>
 
     <script>
     document.getElementById("analyzeBtn").addEventListener("click", async () => {
