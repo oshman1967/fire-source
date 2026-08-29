@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Instagram スキャン デモ</title>
+<style>
+  body {
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+    max-width: 640px;
+    margin: 60px auto;
+    padding: 0 20px;
+    color: #222;
+  }
+  h1 { font-size: 1.3rem; margin-bottom: 8px; }
+  p.desc { color: #666; font-size: 0.9rem; margin-bottom: 32px; }
+  .input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  input[type="text"] {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+  }
+  button {
+    padding: 10px 20px;
+    background: #222;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  button:disabled { background: #999; cursor: default; }
+  #status {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 16px;
+  }
+  .item {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .item .meta {
+    font-size: 0.75rem;
+    color: #999;
+    margin-bottom: 6px;
+  }
+  .item .caption {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+</style>
+</head>
+<body>
+
+<h1>Instagram ハッシュタグ スキャン(デモ)</h1>
+<p class="desc">ハッシュタグを1つ入力すると、Apify経由で直近の投稿を取得します。</p>
+
+<div class="input-row">
+  <input type="text" id="keywordInput" placeholder="例: 美容師">
+  <button id="scanBtn">スキャン実行</button>
+</div>
+
+<div id="status"></div>
+<div id="results"></div>
+
+<script>
+const btn = document.getElementById('scanBtn');
+const input = document.getElementById('keywordInput');
+const statusEl = document.getElementById('status');
+const resultsEl = document.getElementById('results');
+
+btn.addEventListener('click', async () => {
+  const keyword = input.value.trim();
+  if (!keyword) {
+    statusEl.textContent = 'ハッシュタグを入力してください。';
+    return;
+  }
+
+  btn.disabled = true;
+  resultsEl.innerHTML = '';
+  statusEl.textContent = 'スキャン中です…(数十秒かかる場合があります)';
+
+  try {
+    const res = await fetch('/api/instagram-scan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ keyword, limit: 20 })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      statusEl.textContent = 'エラー: ' + (data.error || '不明なエラー');
+      btn.disabled = false;
+      return;
+    }
+
+    statusEl.textContent = `#${data.keyword} の投稿を ${data.count} 件取得しました。`;
+
+    data.items.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML = `
+        <div class="meta">@${item.ownerUsername || '不明'} ・ ♡${item.likesCount ?? '-'} ・ 💬${item.commentsCount ?? '-'} ・ ${item.timestamp || ''}</div>
+        <div class="caption">${(item.caption || '').slice(0, 200)}</div>
+      `;
+      resultsEl.appendChild(div);
+    });
+
+  } catch (err) {
+    statusEl.textContent = '通信エラー: ' + err.message;
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>
