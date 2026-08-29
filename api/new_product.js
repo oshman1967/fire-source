@@ -6,6 +6,31 @@ export default async function handler(req, res) {
   try {
     const formData = req.body;
 
+    // --- SNS実データの軽量チェック(Apify) ---
+    let snsNote = "";
+    try {
+      const rawBusiness = formData.business || "";
+      const keyword = rawBusiness.split(/[\s、,の]/)[0];
+      if (keyword && process.env.APIFY_API_TOKEN) {
+        const apifyRes = await fetch(
+          `https://api.apify.com/v2/acts/apify~instagram-hashtag-scraper/run-sync-get-dataset-items?token=${process.env.APIFY_API_TOKEN}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ hashtags: [keyword], resultsLimit: 5 })
+          }
+        );
+        if (apifyRes.ok) {
+          const items = await apifyRes.json();
+          if (Array.isArray(items) && items.length > 0) {
+            snsNote = `\n\n[SNS実データ確認] #${keyword} のInstagram投稿が実際に確認できました。この事実を踏まえ、verdict.bodyかsignalsのいずれか一箇所に、誇張しない一文で「Instagramでも話題になり始めています」のような形で自然に触れてください。具体的な件数や「バズっている」等の誇張表現は使わないこと。該当する投稿が確認できなかった場合はこの言及自体を省略してください。`;
+          }
+        }
+      }
+    } catch (apifyError) {
+      console.error("Apify skip:", apifyError);
+    }
+
     const systemPrompt = `あなたはFire Sourceというマーケティング分析AIです。編集者としての目利き経験を持つ架空の人格として振る舞ってください。
 
 # Fire Sourceの核となる考え方
@@ -85,7 +110,7 @@ SNS上で兆候が生まれる場所は、漠然とした「生活者」では�
 持っている強み・資産: ${formData.assets}
 狙いたいマーケット・関心のあるジャンル: ${formData.targetMarket}
 想定する規模感: ${formData.scale}
-どうしても実現したいこと: ${formData.mustDo}`;
+どうしても実現したいこと: ${formData.mustDo}${snsNote}`;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
