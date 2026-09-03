@@ -1,3 +1,4 @@
+import { appendToSheet } from "./_lib/appendToSheet.js";
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "POSTのみ対応しています" });
@@ -133,7 +134,17 @@ SNS上で兆候が生まれる場所は、漠然とした「生活者」では�
     const data = await response.json();
     const rawText = data.content?.[0]?.text || "{}";
     const cleaned = rawText.replace(/```json|```/g, "").trim();
-    const report = JSON.parse(cleaned);
+        const report = JSON.parse(cleaned);
+
+    await appendToSheet("新商品", [
+      new Date().toISOString(),
+      formData.business || "",
+      formData.assets || "",
+      formData.targetMarket || "",
+      formData.scale || "",
+      formData.mustDo || "",
+      JSON.stringify(report),
+    ]);
 
     return res.status(200).json(report);
   } catch (error) {
