@@ -58,7 +58,7 @@ export async function appendToSheet(sheetName, rowValues) {
       range
     )}:append?valueInputOption=USER_ENTERED`;
 
-    await fetch(url, {
+        const appendRes = await fetch(url, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -66,6 +66,13 @@ export async function appendToSheet(sheetName, rowValues) {
       },
       body: JSON.stringify({ values: [rowValues] }),
     });
+
+    if (!appendRes.ok) {
+      const errorBody = await appendRes.text();
+      console.error("Sheet append failed:", appendRes.status, errorBody);
+    } else {
+      console.log("Sheet append success:", sheetName);
+    }
   } catch (err) {
     console.error("Sheet append error:", err);
   }
