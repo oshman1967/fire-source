@@ -315,7 +315,7 @@
     line-height: 1.3;
   }
   .cta-lock em { font-style: italic; color: var(--accent); }
-  .cta-lock .cta-num { font-size: 1.25em; }
+  .cta-lock { font-feature-settings: "lnum" 1, "pnum" 1; }
   .cta-desc { font-size: 0.75rem; color: var(--ink-mid); line-height: 1.8; margin-top: 0.5rem; }
   .cta-buttons { display: flex; flex-direction: column; gap: 0.75rem; flex-shrink: 0; }
   .btn-primary {
@@ -613,7 +613,7 @@
   <!-- CTA -->
   <div class="cta-section">
     <div>
-      <div class="cta-lock"><span class="cta-num">3</span>つの案を、<em><span class="cta-num">1</span>つ</em>に。</div>
+      <div class="cta-lock">3つの案を、<em>1つ</em>に。</div>
       <p class="cta-desc">
         どの案が最も勝ち目があるか。すでに動いている競合はいないか。<br>
         専門職の閉鎖網まで踏み込んで検証し、商品化に必要な解像度まで引き上げます。
