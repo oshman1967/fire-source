@@ -653,7 +653,13 @@
   if (!raw) return;
   let r;
   try { r = JSON.parse(raw); } catch (e) { return; }
-    if (!r.verdict) return;
+        if (!r.verdict) return;
+
+  if (r.id) document.getElementById("report-id").textContent = r.id;
+  if (r.generatedAt) {
+    document.getElementById("report-date").textContent = r.generatedAt;
+    document.getElementById("report-eyebrow").textContent = `Analysis Report — ${r.generatedAt}`;
+  }
 
   // brief summary (入力内容の反映)
   const formRaw = sessionStorage.getItem("fireSourceFormData");
