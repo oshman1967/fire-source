@@ -447,13 +447,13 @@
 
   <!-- Report header -->
   <div class="report-header">
-    <div>
-      <p class="report-eyebrow">Analysis Report — 2026.08.05</p>
+      <div>
+      <p class="report-eyebrow" id="report-eyebrow">Analysis Report — 2026.08.05</p>
       <h1 class="report-title">PR設計レポート</h1>
     </div>
     <div class="report-meta">
-      レポートID：PRI-2608-0143<br>
-      生成日時：2026.08.05<br>
+      レポートID：<span id="report-id">PRI-2608-0143</span><br>
+      生成日時：<span id="report-date">2026.08.05</span><br>
       ステータス：自動分析（無料版）
     </div>
   </div>
@@ -686,6 +686,22 @@
     </div>
   `).join("");
 })();
+</script>
+<script>
+  (function () {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const yy = String(yyyy).slice(-2);
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+    const dateStr = `${yyyy}.${mm}.${dd}`;
+    const randomNum = String(Math.floor(Math.random() * 9000) + 1000);
+    const reportId = `PRI-${yy}${mm}-${randomNum}`;
+
+    document.getElementById("report-date").textContent = dateStr;
+    document.getElementById("report-eyebrow").textContent = `Analysis Report — ${dateStr}`;
+    document.getElementById("report-id").textContent = reportId;
+  })();
 </script>
 </body>
 </html>
