@@ -134,9 +134,16 @@ SNS上で兆候が生まれる場所は、漠然とした「生活者」では�
     const data = await response.json();
     const rawText = data.content?.[0]?.text || "{}";
     const cleaned = rawText.replace(/```json|```/g, "").trim();
-        const report = JSON.parse(cleaned);
+          const report = JSON.parse(cleaned);
+
+    const now = new Date();
+    const yy = String(now.getFullYear()).slice(-2);
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    report.id = `PRI-${yy}${mm}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+    report.generatedAt = `${now.getFullYear()}.${mm}.${String(now.getDate()).padStart(2, "0")}`;
 
     await appendToSheet("新商品", [
+      report.id,
       new Date().toISOString(),
       formData.business || "",
       formData.assets || "",
