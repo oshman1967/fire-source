@@ -144,7 +144,7 @@ SNS上で兆候が生まれる場所は、漠然とした「生活者」では�
 
     await appendToSheet("新商品", [
       report.id,
-      new Date().toISOString(),
+      now.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" }),
       formData.business || "",
       formData.assets || "",
       formData.targetMarket || "",
