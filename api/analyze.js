@@ -10,7 +10,10 @@ export default async function handler(req, res) {
     // --- SNS実データの軽量チェック(Apify) ---
     let snsNote = "";
     try {
-      const keyword = (formData.category || "").replace(/\s+/g, "");
+        const keyword = (formData.category || "")
+        .split(/[・、。\s,\/／]/)[0]
+        .replace(/[^\p{L}\p{N}]/gu, "")
+        .slice(0, 15);
       if (keyword && process.env.APIFY_API_TOKEN) {
         const apifyRes = await fetch(
           `https://api.apify.com/v2/acts/apify~instagram-hashtag-scraper/run-sync-get-dataset-items?token=${process.env.APIFY_API_TOKEN}`,
@@ -20,9 +23,10 @@ export default async function handler(req, res) {
             body: JSON.stringify({ hashtags: [keyword], resultsLimit: 5 })
           }
         );
-                if (apifyRes.ok) {
-          const items = await apifyRes.json();
-          if (Array.isArray(items) && items.length > 0) {
+               if (apifyRes.ok) {
+          const rawItems = await apifyRes.json();
+          const items = (Array.isArray(rawItems) ? rawItems : []).filter(it => it && !it.error && it.url);
+          if (items.length > 0) {
             snsNote = `\n\n[SNS実データ確認] #${keyword} のInstagram投稿が実際に確認できました。この事実を踏まえ、verdict.bodyかwarningsのいずれか一箇所に、誇張しない一文で「Instagramでも話題になり始めています」のような形で自然に触れてください。具体的な件数や「バズっている」等の誇張表現は使わないこと。該当する投稿が確認できなかった場合はこの言及自体を省略してください。`;
 
             // --- コメントの軽量チェック(上位2投稿×各10件) ---
