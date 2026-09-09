@@ -10,8 +10,43 @@ export default async function handler(req, res) {
     // --- SNS実データの軽量チェック(Apify) ---
     let snsNote = "";
     try {
-      const rawBusiness = formData.business || "";
-      const keyword = rawBusiness.split(/[\s、,の]/)[0];
+      let keyword = (formData.business || "")
+        .split(/[・、。\s,\/／の]/)[0]
+        .replace(/[^\p{L}\p{N}]/gu, "")
+        .slice(0, 15);
+
+      // --- AI(Haiku)による検索キーワードの意味理解補正 ---
+      try {
+        if (process.env.ANTHROPIC_API_KEY) {
+          const kwRes = await fetch("https://api.anthropic.com/v1/messages", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.ANTHROPIC_API_KEY,
+              "anthropic-version": "2023-06-01",
+            },
+            body: JSON.stringify({
+              model: "claude-haiku-4-5-20251001",
+              max_tokens: 30,
+              system: "あなたはSNS検索キーワードの選定担当です。以下の新規事業相談の内容から、Instagramで実際にハッシュタグとして使われていそうな、最も的確な日本語キーワードを1つだけ出力してください。業種そのものではなく、相談者が本当に狙っている方向性(ターゲット層・マーケット)を優先してください。出力はキーワード1語のみ、説明や記号は一切付けないこと。",
+              messages: [{
+                role: "user",
+                content: `業種・現在の事業: ${formData.business || ""}\n狙いたいマーケット・関心のあるジャンル: ${formData.targetMarket || ""}\nどうしても実現したいこと: ${formData.mustDo || ""}`
+              }],
+            }),
+          });
+          if (kwRes.ok) {
+            const kwData = await kwRes.json();
+            const suggested = (kwData.content?.[0]?.text || "").trim().replace(/[^\p{L}\p{N}]/gu, "");
+            if (suggested && suggested.length <= 15) {
+              keyword = suggested;
+            }
+          }
+        }
+      } catch (kwError) {
+        console.error("Keyword AI skip:", kwError);
+      }
+
       if (keyword && process.env.APIFY_API_TOKEN) {
         const apifyRes = await fetch(
           `https://api.apify.com/v2/acts/apify~instagram-hashtag-scraper/run-sync-get-dataset-items?token=${process.env.APIFY_API_TOKEN}`,
@@ -22,9 +57,37 @@ export default async function handler(req, res) {
           }
         );
         if (apifyRes.ok) {
-          const items = await apifyRes.json();
-          if (Array.isArray(items) && items.length > 0) {
+          const rawItems = await apifyRes.json();
+          const items = (Array.isArray(rawItems) ? rawItems : []).filter(it => it && !it.error && it.url);
+          if (items.length > 0) {
             snsNote = `\n\n[SNS実データ確認] #${keyword} のInstagram投稿が実際に確認できました。この事実を踏まえ、verdict.bodyかsignalsのいずれか一箇所に、誇張しない一文で「Instagramでも話題になり始めています」のような形で自然に触れてください。具体的な件数や「バズっている」等の誇張表現は使わないこと。該当する投稿が確認できなかった場合はこの言及自体を省略してください。`;
+
+            // --- コメントの軽量チェック(上位2投稿×各10件) ---
+            try {
+              const topUrls = items.slice(0, 2).map(it => it.url).filter(Boolean);
+              if (topUrls.length > 0) {
+                const commentRes = await fetch(
+                  `https://api.apify.com/v2/acts/apify~instagram-comment-scraper/run-sync-get-dataset-items?token=${process.env.APIFY_API_TOKEN}`,
+                  {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ directUrls: topUrls, resultsLimit: 10 })
+                  }
+                );
+                if (commentRes.ok) {
+                  const comments = await commentRes.json();
+                  const texts = (Array.isArray(comments) ? comments : [])
+                    .map(c => c.text)
+                    .filter(Boolean)
+                    .slice(0, 20);
+                  if (texts.length > 0) {
+                    snsNote += `\n\n[コメントの生反応(参考情報)] 該当ハッシュタグの投稿に実際についたコメントの一部：\n${texts.map(t => `- ${t}`).join("\n")}\nこれらは投稿を見た人の反射的な反応であり、まだ言語化されていない熱量・欲望の手がかりとして分析の参考にしてください。ただし個々のコメントを引用・言及する必要はなく、あくまで内部の判断材料として扱ってください。`;
+                  }
+                }
+              }
+            } catch (commentError) {
+              console.error("Comment scan skip:", commentError);
+            }
           }
         }
       }
