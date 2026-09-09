@@ -20,10 +20,37 @@ export default async function handler(req, res) {
             body: JSON.stringify({ hashtags: [keyword], resultsLimit: 5 })
           }
         );
-        if (apifyRes.ok) {
+                if (apifyRes.ok) {
           const items = await apifyRes.json();
           if (Array.isArray(items) && items.length > 0) {
             snsNote = `\n\n[SNS実データ確認] #${keyword} のInstagram投稿が実際に確認できました。この事実を踏まえ、verdict.bodyかwarningsのいずれか一箇所に、誇張しない一文で「Instagramでも話題になり始めています」のような形で自然に触れてください。具体的な件数や「バズっている」等の誇張表現は使わないこと。該当する投稿が確認できなかった場合はこの言及自体を省略してください。`;
+
+            // --- コメントの軽量チェック(上位2投稿×各10件) ---
+            try {
+              const topUrls = items.slice(0, 2).map(it => it.url).filter(Boolean);
+              if (topUrls.length > 0) {
+                const commentRes = await fetch(
+                  `https://api.apify.com/v2/acts/apify~instagram-comment-scraper/run-sync-get-dataset-items?token=${process.env.APIFY_API_TOKEN}`,
+                  {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ directUrls: topUrls, resultsLimit: 10 })
+                  }
+                );
+                if (commentRes.ok) {
+                  const comments = await commentRes.json();
+                  const texts = (Array.isArray(comments) ? comments : [])
+                    .map(c => c.text)
+                    .filter(Boolean)
+                    .slice(0, 20);
+                  if (texts.length > 0) {
+                    snsNote += `\n\n[コメントの生反応(参考情報)] 該当ハッシュタグの投稿に実際についたコメントの一部：\n${texts.map(t => `- ${t}`).join("\n")}\nこれらは投稿を見た人の反射的な反応であり、まだ言語化されていない熱量・欲望の手がかりとして分析の参考にしてください。ただし個々のコメントを引用・言及する必要はなく、あくまで内部の判断材料として扱ってください。`;
+                  }
+                }
+              }
+            } catch (commentError) {
+              console.error("Comment scan skip:", commentError);
+            }
           }
         }
       }
