@@ -10,10 +10,42 @@ export default async function handler(req, res) {
     // --- SNS実データの軽量チェック(Apify) ---
     let snsNote = "";
     try {
-        const keyword = (formData.category || "")
+        let keyword = (formData.category || "")
         .split(/[・、。\s,\/／]/)[0]
         .replace(/[^\p{L}\p{N}]/gu, "")
         .slice(0, 15);
+
+      // --- AI(Haiku)による検索キーワードの意味理解補正 ---
+      try {
+        if (process.env.ANTHROPIC_API_KEY) {
+          const kwRes = await fetch("https://api.anthropic.com/v1/messages", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.ANTHROPIC_API_KEY,
+              "anthropic-version": "2023-06-01",
+            },
+            body: JSON.stringify({
+              model: "claude-haiku-4-5-20251001",
+              max_tokens: 30,
+              system: "あなたはSNS検索キーワードの選定担当です。以下の商品相談内容から、Instagramで実際にハッシュタグとして使われていそうな、最も的確な日本語キーワードを1つだけ出力してください。商品カテゴリそのものではなく、相談者が本当に狙っている方向性(ターゲット層・訴求軸)を優先してください。出力はキーワード1語のみ、説明や記号は一切付けないこと。",
+              messages: [{
+                role: "user",
+                content: `商品カテゴリ: ${formData.category || ""}\nブランドイメージ・ターゲット層: ${formData.brandImage || ""}\n補足: ${formData.notes || ""}`
+              }],
+            }),
+          });
+          if (kwRes.ok) {
+            const kwData = await kwRes.json();
+            const suggested = (kwData.content?.[0]?.text || "").trim().replace(/[^\p{L}\p{N}]/gu, "");
+            if (suggested && suggested.length <= 15) {
+              keyword = suggested;
+            }
+          }
+        }
+      } catch (kwError) {
+        console.error("Keyword AI skip:", kwError);
+      }
       if (keyword && process.env.APIFY_API_TOKEN) {
         const apifyRes = await fetch(
           `https://api.apify.com/v2/acts/apify~instagram-hashtag-scraper/run-sync-get-dataset-items?token=${process.env.APIFY_API_TOKEN}`,
