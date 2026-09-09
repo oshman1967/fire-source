@@ -184,9 +184,9 @@ SNS上で兆候が生まれる場所は、漠然とした「生活者」では�
     report.id = `PRI-${yy}${mm}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
     report.generatedAt = `${now.getFullYear()}.${mm}.${String(now.getDate()).padStart(2, "0")}`;
 
-    await appendToSheet("既存商品", [
+      await appendToSheet("既存商品", [
       report.id,
-      new Date().toISOString(),
+      now.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" }),
       formData.category || "",
       formData.priceRange || "",
       formData.productionLot || "",
