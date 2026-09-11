@@ -417,11 +417,14 @@
     </p>
         <button id="analyzeBtn" class="submit-btn" style="border:none; cursor:pointer;">分析を開始する →</button>
   </div>
-  <div id="loadingMsg" style="display:none; font-size:0.75rem; color:var(--ink-light); margin-top:0.75rem; text-align:right;">解析中です…(約30秒)</div>
+    <div id="loadingMsg" style="display:none; font-size:0.75rem; color:var(--ink-light); margin-top:0.75rem; text-align:right;">解析中です…(約60秒)</div>
 
     <script>
-    document.getElementById("analyzeBtn").addEventListener("click", async () => {
+      document.getElementById("analyzeBtn").addEventListener("click", async () => {
+      const btn = document.getElementById("analyzeBtn");
+      btn.disabled = true;
       document.getElementById("loadingMsg").style.display = "block";
+      document.getElementById("loadingMsg").textContent = "解析中です…(約60秒)";
 
       const formData = {
         category: document.getElementById("category-select").value,
@@ -442,8 +445,10 @@
         sessionStorage.setItem("fireSourceReport", JSON.stringify(report));
         sessionStorage.setItem("fireSourceFormData", JSON.stringify(formData));
         window.location.href = "pr_report_mockup.html";
-      } catch (err) {
+        } catch (err) {
         document.getElementById("loadingMsg").textContent = "エラーが発生しました。もう一度お試しください。";
+      } finally {
+        btn.disabled = false;
       }
     });
     </script>
