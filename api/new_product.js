@@ -18,7 +18,8 @@ export default async function handler(req, res) {
       // --- AI(Haiku)による検索キーワードの意味理解補正 ---
       try {
         if (process.env.ANTHROPIC_API_KEY) {
-          const kwRes = await fetch("https://api.anthropic.com/v1/messages", {
+         const kwRes = await fetch("https://api.anthropic.com/v1/messages", {
+            signal: AbortSignal.timeout(5000),
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -48,9 +49,10 @@ export default async function handler(req, res) {
       }
 
       if (keyword && process.env.APIFY_API_TOKEN) {
-        const apifyRes = await fetch(
+       const apifyRes = await fetch(
           `https://api.apify.com/v2/acts/apify~instagram-hashtag-scraper/run-sync-get-dataset-items?token=${process.env.APIFY_API_TOKEN}`,
           {
+            signal: AbortSignal.timeout(8000),
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ hashtags: [keyword], resultsLimit: 5 })
@@ -69,6 +71,7 @@ export default async function handler(req, res) {
                 const commentRes = await fetch(
                   `https://api.apify.com/v2/acts/apify~instagram-comment-scraper/run-sync-get-dataset-items?token=${process.env.APIFY_API_TOKEN}`,
                   {
+                    signal: AbortSignal.timeout(8000),
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ directUrls: topUrls, resultsLimit: 10 })
