@@ -9,6 +9,7 @@ export default async function handler(req, res) {
 
     // --- SNS実データの軽量チェック(Apify) ---
     let snsNote = "";
+    let haikuKeyword = ""; // ★追加：シート書き込み時に使うため、外側で宣言
     try {
         let keyword = (formData.category || "")
         .split(/[・、。\s,\/／]/)[0]
@@ -47,6 +48,9 @@ export default async function handler(req, res) {
       } catch (kwError) {
         console.error("Keyword AI skip:", kwError);
       }
+
+      haikuKeyword = keyword; // ★追加：Apifyの成否に関わらず、最終的に使われたキーワードを保持
+
       if (keyword && process.env.APIFY_API_TOKEN) {
        const apifyRes = await fetch(
           `https://api.apify.com/v2/acts/apify~instagram-hashtag-scraper/run-sync-get-dataset-items?token=${process.env.APIFY_API_TOKEN}`,
@@ -274,6 +278,7 @@ SNS上で兆候が生まれる場所は、漠然とした「生活者」では�
       formData.brandImage || "",
       formData.notes || "",
       JSON.stringify(report),
+      haikuKeyword, // ★追加：末尾の新列
     ]);
 
     return res.status(200).json(report);
