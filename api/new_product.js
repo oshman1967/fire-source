@@ -9,6 +9,7 @@ export default async function handler(req, res) {
 
     // --- SNS実データの軽量チェック(Apify) ---
     let snsNote = "";
+    let haikuKeyword = ""; // ★追加：シート書き込み時に使うため、外側で宣言
     try {
       let keyword = (formData.business || "")
         .split(/[・、。\s,\/／の]/)[0]
@@ -47,6 +48,8 @@ export default async function handler(req, res) {
       } catch (kwError) {
         console.error("Keyword AI skip:", kwError);
       }
+
+      haikuKeyword = keyword; // ★追加：Apifyの成否に関わらず、最終的に使われたキーワードを保持
 
       if (keyword && process.env.APIFY_API_TOKEN) {
        const apifyRes = await fetch(
@@ -231,6 +234,7 @@ SNS上で兆候が生まれる場所は、漠然とした「生活者」では�
       formData.scale || "",
       formData.mustDo || "",
       JSON.stringify(report),
+      haikuKeyword, // ★追加：末尾の新列
     ]);
 
     return res.status(200).json(report);
