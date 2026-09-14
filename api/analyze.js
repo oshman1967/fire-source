@@ -16,7 +16,7 @@ export default async function handler(req, res) {
         .replace(/[^\p{L}\p{N}]/gu, "")
         .slice(0, 15);
 
-      // --- AI(Haiku)による検索キーワードの意味理解補正 ---
+      // --- AI(Haiku)による検索キーワードの意味理解補正(候補3語) ---
       try {
         if (process.env.ANTHROPIC_API_KEY) {
          const kwRes = await fetch("https://api.anthropic.com/v1/messages", {
@@ -29,8 +29,8 @@ export default async function handler(req, res) {
             },
             body: JSON.stringify({
               model: "claude-haiku-4-5-20251001",
-              max_tokens: 30,
-              system: "あなたはSNS検索キーワードの選定担当です。以下の商品相談内容から、Instagramで実際にハッシュタグとして使われていそうな、最も的確な日本語キーワードを1つだけ出力してください。商品カテゴリそのものではなく、相談者が本当に狙っている方向性(ターゲット層・訴求軸)を優先してください。出力はキーワード1語のみ、説明や記号は一切付けないこと。",
+              max_tokens: 40,
+              system: "あなたはSNS検索キーワードの選定担当です。以下の商品相談内容から、Instagramで実際にハッシュタグとして使われていそうな、最も的確な日本語キーワードを、有望だと思う順に3つ出力してください。商品カテゴリそのものではなく、相談者が本当に狙っている方向性(ターゲット層・訴求軸)を優先してください。出力はキーワード3つのみ、カンマ区切りで、説明や記号は一切付けないこと。例:艶感,韓国コスメ,発色",
               messages: [{
                 role: "user",
                 content: `商品カテゴリ: ${formData.category || ""}\nブランドイメージ・ターゲット層: ${formData.brandImage || ""}\n補足: ${formData.notes || ""}`
@@ -39,9 +39,15 @@ export default async function handler(req, res) {
           });
           if (kwRes.ok) {
             const kwData = await kwRes.json();
-            const suggested = (kwData.content?.[0]?.text || "").trim().replace(/[^\p{L}\p{N}]/gu, "");
-            if (suggested && suggested.length <= 15) {
-              keyword = suggested;
+            const rawSuggestion = (kwData.content?.[0]?.text || "").trim();
+            const candidates = rawSuggestion
+              .split(/[,、]/)
+              .map(s => s.trim().replace(/[^\p{L}\p{N}]/gu, ""))
+              .filter(s => s && s.length <= 15)
+              .slice(0, 3);
+            if (candidates.length > 0) {
+              keyword = candidates[0];
+              haikuKeyword = candidates.join(", ");
             }
           }
         }
@@ -49,8 +55,7 @@ export default async function handler(req, res) {
         console.error("Keyword AI skip:", kwError);
       }
 
-      haikuKeyword = keyword; // ★追加：Apifyの成否に関わらず、最終的に使われたキーワードを保持
-
+      if (!haikuKeyword) haikuKeyword = keyword;
       if (keyword && process.env.APIFY_API_TOKEN) {
        const apifyRes = await fetch(
           `https://api.apify.com/v2/acts/apify~instagram-hashtag-scraper/run-sync-get-dataset-items?token=${process.env.APIFY_API_TOKEN}`,
