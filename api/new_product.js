@@ -213,6 +213,22 @@ userMessageの末尾に「Haikuが抽出した検索キーワード候補」が�
 
 参考:Haikuが抽出した検索キーワード候補: ${haikuKeyword || "なし"}`;
 
+        const imageNote = (Array.isArray(formData.images) && formData.images.length > 0)
+      ? "\n\n[添付資料] 商品写真・実績データ等の画像が添付されています。内容を分析の参考にしてください。"
+      : "";
+    const userContent = [];
+    if (Array.isArray(formData.images)) {
+      for (const img of formData.images.slice(0, 5)) {
+        if (img && img.mediaType && img.data && img.mediaType.startsWith("image/")) {
+          userContent.push({
+            type: "image",
+            source: { type: "base64", media_type: img.mediaType, data: img.data }
+          });
+        }
+      }
+    }
+    userContent.push({ type: "text", text: userMessage + imageNote });
+
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -224,7 +240,7 @@ userMessageの末尾に「Haikuが抽出した検索キーワード候補」が�
         model: "claude-sonnet-4-6",
         max_tokens: 4000,
         system: systemPrompt,
-        messages: [{ role: "user", content: userMessage }],
+        messages: [{ role: "user", content: userContent }],
       }),
     });
 
