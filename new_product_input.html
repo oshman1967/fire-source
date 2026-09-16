@@ -425,7 +425,7 @@
   <div class="form-section">
     <p class="section-label">添付資料</p>
     <div class="field">
-      <label>参考資料・実績データなど（複数可・任意）</label>
+      <label>参考資料・実績データなど（複数可・任意　合計3MBまで</label>
       <input type="file" id="mediaUpload" accept="image/*" multiple style="border:0.5px solid var(--rule); background:var(--bg-white); padding:0.9rem 1rem; font-size:0.82rem; width:100%; border-radius:1px;">
     </div>
   </div>
@@ -440,12 +440,36 @@
     document.getElementById("loadingMsg").style.display = "block";
     document.getElementById("loadingMsg").textContent = "解析中です…(約60秒)";
 
+        let images = [];
+    try {
+      const files = Array.from(document.getElementById("mediaUpload").files);
+      const totalSize = files.reduce((sum, f) => sum + f.size, 0);
+      if (totalSize > 3 * 1024 * 1024) {
+        document.getElementById("loadingMsg").textContent = "添付資料の合計サイズが3MBを超えています。枚数を減らすか圧縮してからお試しください。";
+        btn.disabled = false;
+        return;
+      }
+      images = await Promise.all(files.map(file => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const [meta, data] = reader.result.split(",");
+          const mediaType = meta.match(/data:(.*);base64/)[1];
+          resolve({ mediaType, data });
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      })));
+    } catch (fileErr) {
+      console.error("Image read skip:", fileErr);
+    }
+
     const formData = {
       business: document.getElementById("business").value,
       assets: document.getElementById("assets").value,
       targetMarket: document.getElementById("targetMarket").value,
       scale: document.getElementById("scale").value,
       mustDo: document.getElementById("mustDo").value,
+      images: images,
     };
 
     try {
