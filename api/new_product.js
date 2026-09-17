@@ -214,10 +214,11 @@ userMessageの末尾に「Haikuが抽出した検索キーワード候補」が�
 
 参考:Haikuが抽出した検索キーワード候補: ${haikuKeyword || "なし"}`;
 
-        const imageNote = (Array.isArray(formData.images) && formData.images.length > 0)
+            const imageNote = (Array.isArray(formData.images) && formData.images.length > 0)
       ? "\n\n[添付資料] 商品写真・実績データ等の画像が添付されています。内容を分析の参考にしてください。"
       : "";
     const userContent = [];
+    const imageUrls = [];
     if (Array.isArray(formData.images)) {
       for (const img of formData.images.slice(0, 5)) {
         if (img && img.mediaType && img.data && img.mediaType.startsWith("image/")) {
@@ -225,6 +226,17 @@ userMessageの末尾に「Haikuが抽出した検索キーワード候補」が�
             type: "image",
             source: { type: "base64", media_type: img.mediaType, data: img.data }
           });
+          try {
+            const ext = img.mediaType.split("/")[1] || "jpg";
+            const filename = `uploads/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+            const { url } = await put(filename, Buffer.from(img.data, "base64"), {
+              access: "public",
+              contentType: img.mediaType,
+            });
+            imageUrls.push(url);
+          } catch (blobError) {
+            console.error("Blob upload skip:", blobError);
+          }
         }
       }
     }
