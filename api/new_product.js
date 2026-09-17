@@ -1,4 +1,5 @@
 import { appendToSheet } from "./_lib/appendToSheet.js";
+import { put } from "@vercel/blob";
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "POSTのみ対応しています" });
