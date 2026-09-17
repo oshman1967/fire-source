@@ -322,6 +322,7 @@ userMessageの末尾に「Haikuが抽出した検索キーワード候補」が�
       formData.notes || "",
       JSON.stringify(report),
       haikuKeyword, // ★追加：末尾の新列
+      imageUrls.join(", "), // ★追加：画像URL列
     ]);
 
     return res.status(200).json(report);
