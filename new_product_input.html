@@ -479,6 +479,7 @@
         body: JSON.stringify(formData),
       });
       const report = await res.json();
+        if (!res.ok || !report.verdict) throw new Error("analysis failed");
       sessionStorage.setItem("fireSourceNewProductReport", JSON.stringify(report));
       sessionStorage.setItem("fireSourceNewProductFormData", JSON.stringify(formData));
       window.location.href = "new_product_report.html";
