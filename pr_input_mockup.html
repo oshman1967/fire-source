@@ -466,6 +466,7 @@
           body: JSON.stringify(formData),
         });
         const report = await res.json();
+        if (!res.ok || !report.verdict) throw new Error("analysis failed");
         sessionStorage.setItem("fireSourceReport", JSON.stringify(report));
         sessionStorage.setItem("fireSourceFormData", JSON.stringify(formData));
         window.location.href = "pr_report_mockup.html";
