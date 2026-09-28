@@ -258,10 +258,36 @@ userMessageの末尾に「Haikuが抽出した検索キーワード候補」が�
     });
 
     const data = await response.json();
-    const rawText = data.content?.[0]?.text || "{}";
+    const recordFailure = async (reason) => {
+      console.error("Analysis failed:", reason);
+      const failNow = new Date();
+      const failId = `PRI-${String(failNow.getFullYear()).slice(-2)}${String(failNow.getMonth() + 1).padStart(2, "0")}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+      await appendToSheet("新商品", [
+        failId,
+        failNow.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" }),
+        formData.business || "",
+        formData.assets || "",
+        formData.targetMarket || "",
+        formData.scale || "",
+        formData.mustDo || "",
+        JSON.stringify({ status: "failed", reason }),
+        haikuKeyword,
+        imageUrls.join(", "),
+      ]);
+    };
+    const rawText = data.content?.[0]?.text;
+    if (!response.ok || !rawText) {
+      await recordFailure(data.error?.message || `HTTP ${response.status}`);
+      return res.status(502).json({ error: "分析中にエラーが発生しました" });
+    }
     const cleaned = rawText.replace(/```json|```/g, "").trim();
-          const report = JSON.parse(cleaned);
-
+         let report;
+    try {
+      report = JSON.parse(cleaned);
+    } catch (parseErr) {
+      await recordFailure("応答のJSON解析に失敗");
+      return res.status(502).json({ error: "分析中にエラーが発生しました" });
+    }
     const now = new Date();
     const yy = String(now.getFullYear()).slice(-2);
     const mm = String(now.getMonth() + 1).padStart(2, "0");
