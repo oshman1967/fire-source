@@ -273,6 +273,165 @@
   .progress-step.active { background: var(--accent); }
   .progress-step.done { background: var(--ink); }
 
+
+  /* Report preview box */
+  .report-preview {
+    border: 0.5px solid var(--rule);
+    background: var(--bg-white);
+    border-radius: 2px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .report-preview p.report-preview-title {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+  .report-preview ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .report-preview li {
+    font-size: 0.78rem;
+    color: var(--ink-mid);
+    line-height: 1.6;
+    padding-left: 1.1rem;
+    position: relative;
+  }
+  .report-preview li::before {
+    content: "◆";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 0.6rem;
+    top: 0.3rem;
+  }
+
+  /* Required / optional badges */
+  .req-badge, .opt-badge {
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+    padding: 0.1rem 0.5rem;
+    border-radius: 10px;
+    margin-left: 0.5rem;
+    font-weight: 500;
+    vertical-align: middle;
+  }
+  .req-badge { background: var(--accent-light); color: var(--accent); }
+  .opt-badge { background: var(--rule); color: var(--ink-light); }
+
+  /* Optional details toggle */
+  details.optional-fields {
+    border: 0.5px solid var(--rule);
+    border-radius: 2px;
+    padding: 0.9rem 1.25rem;
+    background: var(--bg-white);
+  }
+  details.optional-fields > summary {
+    cursor: pointer;
+    font-size: 0.78rem;
+    color: var(--accent);
+    letter-spacing: 0.03em;
+    list-style: none;
+  }
+  details.optional-fields > summary::-webkit-details-marker { display: none; }
+  details.optional-fields > summary::before {
+    content: "＋ ";
+  }
+  details.optional-fields[open] > summary::before {
+    content: "－ ";
+  }
+  details.optional-fields > .optional-fields-body {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  /* Autosave note */
+  .autosave-note {
+    font-size: 0.65rem;
+    color: var(--ink-light);
+    margin-top: 0.5rem;
+  }
+
+  /* Confirm modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26,26,26,0.55);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--bg-white);
+    max-width: 480px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    border-radius: 2px;
+    padding: 2rem;
+  }
+  .modal-box h2 {
+    font-family: 'Cormorant Garamond', 'Shippori Mincho', serif;
+    font-weight: 400;
+    font-size: 1.4rem;
+    margin-bottom: 1.25rem;
+    color: var(--ink);
+  }
+  .modal-row {
+    border-bottom: 0.5px solid var(--rule);
+    padding: 0.6rem 0;
+  }
+  .modal-row .modal-label {
+    font-size: 0.65rem;
+    color: var(--ink-light);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.2rem;
+  }
+  .modal-row .modal-value {
+    font-size: 0.82rem;
+    color: var(--ink);
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+  .modal-buttons {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+  }
+  .modal-buttons button {
+    flex: 1;
+    padding: 0.85rem;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.8rem;
+    border-radius: 2px;
+    cursor: pointer;
+    border: 0.5px solid var(--rule);
+  }
+  .modal-btn-back {
+    background: var(--bg-white);
+    color: var(--ink-mid);
+  }
+  .modal-btn-confirm {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+
+  /* Progress stage text */
+  #loadingMsg .stage-line {
+    display: block;
+  }
+
   /* Mobile */
   @media (max-width: 600px) {
     header { padding: 1.25rem 1.5rem;  flex-wrap: wrap; }
@@ -317,7 +476,7 @@
     <p class="section-label">商品基本情報</p>
     <div class="grid-2">
       <div class="field">
-        <label>商品カテゴリ</label>
+        <label>商品カテゴリ<span class="req-badge">必須</span></label>
         <select id="category-select" onchange="document.getElementById('category-other-field').style.display = (this.value === 'その他') ? 'flex' : 'none';">
           <option value="">選択してください</option>
           <option>食品・飲料</option>
@@ -330,41 +489,23 @@
           <option>その他</option>
         </select>
       </div>
+      <div class="field">
+        <label>目的<span class="req-badge">必須</span></label>
+        <select id="purpose-select">
+          <option value="">選択してください</option>
+          <option>認知拡大</option>
+          <option>新規顧客獲得</option>
+          <option>SNSで話題化したい</option>
+          <option>メディア掲載を増やしたい</option>
+        </select>
+      </div>
       <div class="field" id="category-other-field" style="display:none;">
         <label>カテゴリ（その他・具体的に）</label>
         <input type="text" placeholder="例：ハンドメイド雑貨">
       </div>
       <div class="field">
-        <label>価格帯（税込）</label>
-          <select id="price-select">
-          <option>500円以下</option>
-          <option>500〜2,000円</option>
-          <option>2,000〜10,000円</option>
-          <option>10,000〜50,000円</option>
-          <option>50,000〜100,000円</option>
-          <option>100,000円以上</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <!-- Section 2 -->
-  <div class="form-section">
-    <p class="section-label">生産・在庫規模</p>
-    <div class="field">
-      <label>月間生産ロット（目安）</label>
-      <p class="budget-hint" style="margin-top:-0.5rem;">＊稼働数を含む</p>
-      <div class="scale-options">
-        <input type="radio" name="lot" id="lot1" value="100">
-        <label for="lot1">〜100個</label>
-        <input type="radio" name="lot" id="lot2" value="1000">
-        <label for="lot2">100〜1,000個</label>
-        <input type="radio" name="lot" id="lot3" value="10000" checked>
-        <label for="lot3">1,000〜10,000個</label>
-        <input type="radio" name="lot" id="lot4" value="100000">
-        <label for="lot4">10,000〜100,000個</label>
-        <input type="radio" name="lot" id="lot5" value="over">
-        <label for="lot5">100,000個以上</label>
+        <label>価格帯（税込）<span class="req-badge">必須</span></label>
+        <input type="text" id="price-input" placeholder="例：1個2,500円前後">
       </div>
     </div>
   </div>
@@ -392,90 +533,271 @@
 
   <!-- Section 4 -->
   <div class="form-section">
-    <p class="section-label">ブランド・ターゲット</p>
+    <p class="section-label">ターゲット・ご相談内容</p>
     <div class="field">
-      <label>ブランドイメージ・ターゲット層</label>
-      <textarea id="brand-textarea" placeholder="例：30代女性向け。高級感があるが親しみやすい。健康意識が高く、情報感度の高いアーリーアダプター層を狙いたい。"></textarea>
+      <label>ターゲット層<span class="req-badge">必須</span></label>
+      <textarea id="target-textarea" placeholder="例：健康意識が高く、情報感度の高いアーリーアダプター層の30代女性。"></textarea>
     </div>
     <div class="field" style="margin-top:1rem">
-      <label>ご相談したい内容</label>
+      <label>ご相談したい内容<span class="req-badge">必須</span></label>
       <textarea id="notes-textarea" placeholder="例：長く続くブランドだが、これまでとは違う層にも届けたい。差別化ポイントは素材へのこだわり。"></textarea>
     </div>
   </div>
 
   <div class="form-section">
-    <p class="section-label">添付資料</p>
-    <div class="field">
-      <label>商品写真・パッケージ写真など（複数可・任意　合計3MBまで）</label>
-      <input type="file" id="mediaUpload" accept="image/*" multiple style="border:0.5px solid var(--rule); background:var(--bg-white); padding:0.9rem 1rem; font-size:0.82rem; width:100%; border-radius:1px;">
-    </div>
+    <details class="optional-fields">
+      <summary>詳しく伝える（任意）</summary>
+      <div class="optional-fields-body">
+        <div class="field">
+          <label>ブランドイメージ<span class="opt-badge">任意</span></label>
+          <textarea id="brand-textarea" placeholder="例：高級感があるが親しみやすい。"></textarea>
+        </div>
+        <div class="field">
+          <label>月間生産ロット（目安）<span class="opt-badge">任意</span></label>
+          <p class="budget-hint" style="margin-top:-0.2rem;">＊稼働数を含む</p>
+          <input type="text" id="lot-input" placeholder="例：月産3,000個、または月10稼働">
+        </div>
+        <div class="field">
+          <label>商品写真・パッケージ写真など<span class="opt-badge">任意</span>（複数可・合計3MBまで）</label>
+          <input type="file" id="mediaUpload" accept="image/*" multiple style="border:0.5px solid var(--rule); background:var(--bg-white); padding:0.9rem 1rem; font-size:0.82rem; width:100%; border-radius:1px;">
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <div class="report-preview">
+    <p class="report-preview-title">分析レポートの内容</p>
+    <ul>
+      <li>事業設計スコア（何が強く、何が弱いかが一目で分かるランク）</li>
+      <li>商品・企画の提案（いま磨くべきポイント）</li>
+      <li>狙うべき客層（まだ気づかれていない需要）</li>
+      <li>広め方の提案（媒体・インフルエンサー・予算の考え方）</li>
+      <li>まず取り組むべきこと（優先順位つきの次の一手）</li>
+    </ul>
   </div>
 
     <div class="submit-area">
-    <p class="submit-note">
-      入力内容をもとに、推奨媒体・インフルエンサー構成・予算配分の設計レポートを生成します。所要時間：約60秒
-    </p>
+    <p class="autosave-note">入力内容はこの端末に自動保存されます</p>
         <button id="analyzeBtn" class="submit-btn" style="border:none; cursor:pointer;">分析を開始する →</button>
   </div>
     <div id="loadingMsg" style="display:none; font-size:0.75rem; color:var(--ink-light); margin-top:0.75rem; text-align:right;">解析中です…(約60秒)</div>
 
-    <script>
-      document.getElementById("analyzeBtn").addEventListener("click", async () => {
-      const btn = document.getElementById("analyzeBtn");
-      btn.disabled = true;
-      document.getElementById("loadingMsg").style.display = "block";
-      document.getElementById("loadingMsg").textContent = "解析中です…(約60秒)";
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal-box">
+      <h2>この内容で送信しますか？</h2>
+      <div id="confirmModalBody"></div>
+      <div class="modal-buttons">
+        <button class="modal-btn-back" id="modalBackBtn">戻って直す</button>
+        <button class="modal-btn-confirm" id="modalConfirmBtn">この内容で送信する</button>
+      </div>
+    </div>
+  </div>
 
-            let images = [];
-      try {
-        const files = Array.from(document.getElementById("mediaUpload").files);
-        const totalSize = files.reduce((sum, f) => sum + f.size, 0);
-        if (totalSize > 3 * 1024 * 1024) {
-          document.getElementById("loadingMsg").textContent = "添付資料の合計サイズが3MBを超えています。枚数を減らすか圧縮してからお試しください。";
-          btn.disabled = false;
+    <script>
+      // --- 自動保存(テキスト項目のみ、画像は対象外) ---
+      const DRAFT_KEY = "fireSourcePrDraft";
+      const textFieldIds = ["category-select", "purpose-select", "price-input", "lot-input", "target-textarea", "brand-textarea", "notes-textarea"];
+
+      function restoreDraft() {
+        try {
+          const raw = localStorage.getItem(DRAFT_KEY);
+          if (!raw) return;
+          const draft = JSON.parse(raw);
+          textFieldIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && draft[id] !== undefined) el.value = draft[id];
+          });
+          const budgetVal = draft["budget-radio"];
+          if (budgetVal) {
+            const r = document.querySelector(`input[name="budget"][value="${budgetVal}"]`);
+            if (r) r.checked = true;
+          }
+          if (draft["category-select"] === "その他") {
+            document.getElementById("category-other-field").style.display = "flex";
+          }
+        } catch (e) {
+          console.error("Draft restore skip:", e);
+        }
+      }
+
+      function saveDraft() {
+        try {
+          const draft = {};
+          textFieldIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) draft[id] = el.value;
+          });
+          const checkedBudget = document.querySelector('input[name="budget"]:checked');
+          if (checkedBudget) draft["budget-radio"] = checkedBudget.value;
+          localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+        } catch (e) {
+          console.error("Draft save skip:", e);
+        }
+      }
+
+      function clearDraft() {
+        try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+      }
+
+      restoreDraft();
+      textFieldIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener("input", saveDraft);
+        if (el && el.tagName === "SELECT") el.addEventListener("change", saveDraft);
+      });
+      document.querySelectorAll('input[name="budget"]').forEach(r => r.addEventListener("change", saveDraft));
+
+      // --- 待機画面の進捗表示(簡易版・タイマー式) ---
+      const progressStages = [
+        "相談内容を読み取っています",
+        "SNSの公開データを分析しています",
+        "AIが情報を統合しています",
+        "レポートを作成しています"
+      ];
+      let progressTimer = null;
+      function startProgressDisplay() {
+        let stageIndex = 0;
+        const msgEl = document.getElementById("loadingMsg");
+        msgEl.textContent = progressStages[0] + "…";
+        const stageDurations = [4000, 14000, 20000];
+        let cumulative = 0;
+        stageDurations.forEach((d, i) => {
+          cumulative += d;
+          setTimeout(() => {
+            if (stageIndex <= i + 1) {
+              stageIndex = i + 1;
+              msgEl.textContent = progressStages[stageIndex] + "…";
+            }
+          }, cumulative);
+        });
+        return () => {};
+      }
+
+      // --- 送信前の確認ポップアップ ---
+      function getCurrentFormValues() {
+        const files = Array.from(document.getElementById("mediaUpload").files || []);
+        return {
+          category: document.getElementById("category-select").value,
+          purpose: document.getElementById("purpose-select").value,
+          price: document.getElementById("price-input").value,
+          lot: document.getElementById("lot-input").value,
+          budget: document.querySelector('input[name="budget"]:checked')?.nextElementSibling.textContent || "",
+          targetLayer: document.getElementById("target-textarea").value,
+          brandImage: document.getElementById("brand-textarea").value,
+          notes: document.getElementById("notes-textarea").value,
+          fileNames: files.map(f => `${f.name}（${(f.size/1024/1024).toFixed(1)}MB）`),
+        };
+      }
+
+      function renderConfirmModal(values) {
+        const rows = [
+          ["商品カテゴリ", values.category || "（未入力）"],
+          ["目的", values.purpose || "（未入力）"],
+          ["価格帯", values.price || "（未入力）"],
+          ["月間PR予算", values.budget || "（未入力）"],
+          ["ターゲット層", values.targetLayer || "（未入力）"],
+          ["ご相談したい内容", values.notes || "（未入力）"],
+        ];
+        if (values.lot) rows.push(["月間生産ロット", values.lot]);
+        if (values.brandImage) rows.push(["ブランドイメージ", values.brandImage]);
+        if (values.fileNames.length > 0) rows.push(["添付写真", values.fileNames.join("\n")]);
+
+        const body = document.getElementById("confirmModalBody");
+        body.innerHTML = rows.map(([label, value]) => `
+          <div class="modal-row">
+            <div class="modal-label">${label}</div>
+            <div class="modal-value">${value.replace(/</g, "&lt;")}</div>
+          </div>
+        `).join("");
+      }
+
+      function requiredFieldsMissing(values) {
+        const missing = [];
+        if (!values.category) missing.push("商品カテゴリ");
+        if (!values.purpose) missing.push("目的");
+        if (!values.price) missing.push("価格帯");
+        if (!values.targetLayer) missing.push("ターゲット層");
+        if (!values.notes) missing.push("ご相談したい内容");
+        return missing;
+      }
+
+      document.getElementById("analyzeBtn").addEventListener("click", () => {
+        const values = getCurrentFormValues();
+        const missing = requiredFieldsMissing(values);
+        if (missing.length > 0) {
+          document.getElementById("loadingMsg").style.display = "block";
+          document.getElementById("loadingMsg").textContent = `必須項目が未入力です：${missing.join("、")}`;
           return;
         }
-        images = await Promise.all(files.map(file => new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const [meta, data] = reader.result.split(",");
-            const mediaType = meta.match(/data:(.*);base64/)[1];
-            resolve({ mediaType, data });
-          };
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        })));
-      } catch (fileErr) {
-        console.error("Image read skip:", fileErr);
-      }
+        document.getElementById("loadingMsg").style.display = "none";
+        renderConfirmModal(values);
+        document.getElementById("confirmModal").classList.add("open");
+      });
 
-      const formData = {
-        category: document.getElementById("category-select").value,
-        priceRange: document.getElementById("price-select").value,
-        productionLot: document.querySelector('input[name="lot"]:checked')?.nextElementSibling.textContent || "",
-        budget: document.querySelector('input[name="budget"]:checked')?.nextElementSibling.textContent || "",
-        brandImage: document.getElementById("brand-textarea").value,
-        notes: document.getElementById("notes-textarea").value,
-        images: images,
-      };
+      document.getElementById("modalBackBtn").addEventListener("click", () => {
+        document.getElementById("confirmModal").classList.remove("open");
+      });
 
-      try {
-        const res = await fetch("/api/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
-        const report = await res.json();
-        if (!res.ok || !report.verdict) throw new Error("analysis failed");
-        sessionStorage.setItem("fireSourceReport", JSON.stringify(report));
-        sessionStorage.setItem("fireSourceFormData", JSON.stringify({ ...formData, images: [] }));
-        window.location.href = "pr_report_mockup.html";
+      document.getElementById("modalConfirmBtn").addEventListener("click", async () => {
+        document.getElementById("confirmModal").classList.remove("open");
+        const btn = document.getElementById("analyzeBtn");
+        btn.disabled = true;
+        document.getElementById("loadingMsg").style.display = "block";
+        startProgressDisplay();
+
+        let images = [];
+        try {
+          const files = Array.from(document.getElementById("mediaUpload").files);
+          const totalSize = files.reduce((sum, f) => sum + f.size, 0);
+          if (totalSize > 3 * 1024 * 1024) {
+            document.getElementById("loadingMsg").textContent = "添付資料の合計サイズが3MBを超えています。枚数を減らすか圧縮してからお試しください。";
+            btn.disabled = false;
+            return;
+          }
+          images = await Promise.all(files.map(file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              const [meta, data] = reader.result.split(",");
+              const mediaType = meta.match(/data:(.*);base64/)[1];
+              resolve({ mediaType, data });
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          })));
+        } catch (fileErr) {
+          console.error("Image read skip:", fileErr);
+        }
+
+        const formData = {
+          category: document.getElementById("category-select").value,
+          purpose: document.getElementById("purpose-select").value,
+          price: document.getElementById("price-input").value,
+          lot: document.getElementById("lot-input").value,
+          budget: document.querySelector('input[name="budget"]:checked')?.nextElementSibling.textContent || "",
+          targetLayer: document.getElementById("target-textarea").value,
+          brandImage: document.getElementById("brand-textarea").value,
+          notes: document.getElementById("notes-textarea").value,
+          images: images,
+        };
+
+        try {
+          const res = await fetch("/api/analyze", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+          });
+          const report = await res.json();
+          if (!res.ok || !report.verdict) throw new Error("analysis failed");
+          sessionStorage.setItem("fireSourceReport", JSON.stringify(report));
+          sessionStorage.setItem("fireSourceFormData", JSON.stringify({ ...formData, images: [] }));
+          clearDraft();
+          window.location.href = "pr_report_mockup.html";
         } catch (err) {
-        document.getElementById("loadingMsg").textContent = "エラーが発生しました。もう一度お試しください。";
-      } finally {
-        btn.disabled = false;
-      }
-    });
+          document.getElementById("loadingMsg").textContent = "エラーが発生しました。もう一度お試しください。";
+        } finally {
+          btn.disabled = false;
+        }
+      });
     </script>
   </div>
 
