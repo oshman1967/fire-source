@@ -397,6 +397,106 @@
     color: #fff;
   }
 
+
+  /* Score breakdown pills */
+  .score-breakdown {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+  .score-pill {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    border: 0.5px solid #444;
+    border-radius: 20px;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.72rem;
+    color: #ccc;
+  }
+  .score-pill .score-pill-label { color: #999; }
+  .score-pill .score-pill-grade {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--accent);
+  }
+  .score-pill .score-pill-reason {
+    font-size: 0.65rem;
+    color: #888;
+    display: block;
+    width: 100%;
+    margin-top: 0.15rem;
+  }
+
+  /* Fuel stages */
+  .fuel-stage-card {
+    border: 0.5px solid var(--rule);
+    border-radius: 2px;
+    padding: 1.25rem 1.5rem;
+    background: var(--bg-white);
+    margin-bottom: 0.9rem;
+    position: relative;
+    padding-left: 3rem;
+  }
+  .fuel-stage-number {
+    position: absolute;
+    left: 1rem;
+    top: 1.2rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    color: var(--accent);
+    font-style: italic;
+  }
+  .fuel-stage-card h3 { font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--ink); }
+  .fuel-stage-card p.fuel-stage-desc { font-size: 0.82rem; line-height: 1.7; color: var(--ink-mid); margin-bottom: 0.5rem; }
+  .fuel-stage-budget { font-size: 0.72rem; color: var(--accent); letter-spacing: 0.03em; }
+
+  /* Next actions */
+  .next-actions-list {
+    list-style: none;
+    counter-reset: nextaction;
+  }
+  .next-actions-list li {
+    counter-increment: nextaction;
+    position: relative;
+    padding: 0.9rem 0 0.9rem 2.5rem;
+    border-bottom: 0.5px solid var(--rule);
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+  .next-actions-list li:last-child { border-bottom: none; }
+  .next-actions-list li::before {
+    content: counter(nextaction);
+    position: absolute;
+    left: 0;
+    top: 0.8rem;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  /* Spark type badge */
+  .spark-type {
+    display: inline-block;
+    font-size: 0.62rem;
+    letter-spacing: 0.05em;
+    color: var(--ink-light);
+    border: 0.5px solid var(--rule);
+    border-radius: 10px;
+    padding: 0.1rem 0.6rem;
+    margin-bottom: 0.5rem;
+  }
+
   @media (max-width: 640px) {
     header { padding: 1.25rem 1.5rem;  flex-wrap: wrap; }
     .pr-badge { order: 3; margin-top: 0.4rem; }
@@ -470,20 +570,26 @@
   <!-- Brief summary bar -->
   <div class="brief-bar">
     <div class="brief-item">
-      <div class="brief-item-label">ご相談</div>
-      <div class="brief-item-value">新商品のアイデア</div>
-    </div>
-        <div class="brief-item">
-      <div class="brief-item-label">現在の事業</div>
+      <div class="brief-item-label">業種・現在の事業</div>
       <div class="brief-item-value" id="brief-business">韓国コスメの輸入販売</div>
     </div>
     <div class="brief-item">
-      <div class="brief-item-label">自社製品</div>
-      <div class="brief-item-value">なし</div>
+      <div class="brief-item-label">持っている強み・資産</div>
+      <div class="brief-item-value" id="brief-assets">—</div>
     </div>
-        <div class="brief-item">
-      <div class="brief-item-label">狙いたい領域</div>
+    <div class="brief-item">
+      <div class="brief-item-label">狙いたいマーケット</div>
       <div class="brief-item-value" id="brief-market">未定・提案を希望</div>
+    </div>
+    <div class="brief-item">
+      <div class="brief-item-label">想定する規模感</div>
+      <div class="brief-item-value" id="brief-scale">—</div>
+    </div>
+  </div>
+  <div class="brief-bar" style="border-top:none;">
+    <div class="brief-item" style="flex:1 1 100%; border-right:none;">
+      <div class="brief-item-label">ご相談したい内容</div>
+      <div class="brief-item-value" id="brief-mustdo" style="font-size:0.8rem; font-weight:300; letter-spacing:0;">—</div>
     </div>
   </div>
 
@@ -496,6 +602,7 @@
       <div class="verdict-text">
       <h2 id="verdict-title">商品を持たないことが弱みではなく、資産が眠っている状態です。</h2>
       <p id="verdict-body">御社が本当に持っているのは商品ではなく、「どれが本当に良いかを見分けてきた目利き」と「なぜそれが良いかを説明できる現地知識」です。輸入販売ではこれが仕入れ判断という社内利用に留まり、利益になっていません。ここが頭打ちの構造的な原因です。</p>
+      <div class="score-breakdown" id="score-breakdown"></div>
     </div>
   </div>
 
@@ -558,9 +665,9 @@
     </table>
   </div>
 
-  <!-- 03 商品コンセプト案 -->
+  <!-- 03 火種:商品コンセプト案 -->
   <div class="section">
-        <p class="section-label">03 — 商品コンセプト案</p>
+        <p class="section-label">03 — 火種：商品・企画の提案</p>
     <div class="media-grid" id="concept-grid">
       <div class="media-card">
         <div class="media-badge badge-rec">A案</div>
@@ -583,9 +690,21 @@
     </div>
   </div>
 
+  <!-- 05 燃料:広め方の提案 -->
+  <div class="section">
+    <p class="section-label">05 — 燃料：広め方の提案</p>
+    <div id="fuel-stage-list"></div>
+  </div>
+
+  <!-- 06 まず取り組むべきこと -->
+  <div class="section">
+    <p class="section-label">06 — まず取り組むべきこと</p>
+    <ol class="next-actions-list" id="next-actions-list"></ol>
+  </div>
+
   <!-- 04 ターゲット像 -->
   <div class="section">
-    <p class="section-label">04 — 想定されるターゲット像</p>
+    <p class="section-label">04 — 燃える場所：想定されるターゲット像</p>
     <div class="persona-callout">
        <p class="persona-label">この商品を待っている層</p>
       <div class="persona-grid" id="target-persona-grid">
@@ -656,13 +775,16 @@
     document.getElementById("report-date").textContent = r.generatedAt;
     document.getElementById("report-eyebrow").textContent = `Analysis Report — ${r.generatedAt}`;
   }
-  // brief summary
+  // brief summary(入力内容の再表示、全項目)
   const formRaw = sessionStorage.getItem("fireSourceNewProductFormData");
   if (formRaw) {
     try {
       const f = JSON.parse(formRaw);
       document.getElementById("brief-business").textContent = f.business || "—";
+      document.getElementById("brief-assets").textContent = f.assets || "—";
       document.getElementById("brief-market").textContent = f.targetMarket || "—";
+      document.getElementById("brief-scale").textContent = f.scale || "—";
+      document.getElementById("brief-mustdo").textContent = f.mustDo || "—";
     } catch (e) {}
   }
 
@@ -671,18 +793,37 @@
   document.getElementById("verdict-title").textContent = r.verdict.title;
   document.getElementById("verdict-body").textContent = r.verdict.body;
 
-  // 01 signals
+  // 事業設計スコアの内訳(火種・燃える場所・燃料)
+  if (r.scoreBreakdown) {
+    const labels = { spark: "火種", place: "燃える場所", fuel: "燃料" };
+    const order = ["spark", "place", "fuel"];
+    const breakdown = document.getElementById("score-breakdown");
+    breakdown.innerHTML = order
+      .filter(key => r.scoreBreakdown[key])
+      .map(key => {
+        const b = r.scoreBreakdown[key];
+        return `
+          <div class="score-pill">
+            <span class="score-pill-label">${labels[key]}</span>
+            <span class="score-pill-grade">${b.grade}</span>
+            <span class="score-pill-reason">${b.reason || ""}</span>
+          </div>
+        `;
+      }).join("");
+  }
+
+  // 01 signals(兆候)
   const signalGrid = document.getElementById("signal-grid");
-  signalGrid.innerHTML = r.signals.map(s => `
+  signalGrid.innerHTML = (r.signals || []).map(s => `
     <div class="persona-card">
       <div class="persona-tag">${s.tag}</div>
       <p class="persona-desc">${s.desc}</p>
     </div>
   `).join("");
 
-  // 02 strengths
+  // 02 strengths(強みとの接点)
   const strengthsTbody = document.getElementById("strengths-tbody");
-  strengthsTbody.innerHTML = r.strengths.map(s => `
+  strengthsTbody.innerHTML = (r.strengths || []).map(s => `
     <tr>
       <td data-label="御社の資産"><span class="tier-badge tier-core">${s.tag}</span></td>
       <td data-label="これまでの使われ方">${s.usage}</td>
@@ -690,25 +831,48 @@
     </tr>
   `).join("");
 
-  // 03 concepts
+  // 03 sparks(火種、旧concepts)
   const conceptGrid = document.getElementById("concept-grid");
-  conceptGrid.innerHTML = r.concepts.map(c => `
+  const sparks = r.sparks || r.concepts || [];
+  conceptGrid.innerHTML = sparks.map(c => `
     <div class="media-card">
-      <div class="media-badge badge-rec">${c.badge}</div>
+      <div class="media-badge badge-rec">${c.badge || c.type || ""}</div>
       <h3>${c.title}</h3>
       <p>${c.desc}</p>
-      <p class="media-budget">${c.impact}</p>
+      <p class="media-budget">${c.impact || ""}</p>
     </div>
   `).join("");
 
-  // 04 target personas
+  // 04 target personas(燃える場所)
   const targetGrid = document.getElementById("target-persona-grid");
-  targetGrid.innerHTML = r.personas.map(p => `
+  targetGrid.innerHTML = (r.personas || []).map(p => `
     <div class="persona-card">
       <div class="persona-tag">${p.tag}</div>
       <p class="persona-desc">${p.desc}</p>
     </div>
   `).join("");
+
+  // 05 燃料の段階的投下(fuelStages)
+  const fuelStageList = document.getElementById("fuel-stage-list");
+  if (fuelStageList) {
+    fuelStageList.innerHTML = (r.fuelStages || []).map(fs => `
+      <div class="fuel-stage-card">
+        <div class="fuel-stage-number">${fs.stage}</div>
+        <h3>${fs.title}</h3>
+        <p class="fuel-stage-desc">${fs.desc}</p>
+        <p class="fuel-stage-budget">${fs.budgetGuide || ""}</p>
+      </div>
+    `).join("");
+  }
+
+  // 06 まず取り組むべきこと(nextActions)
+  const nextActionsList = document.getElementById("next-actions-list");
+  if (nextActionsList) {
+    nextActionsList.innerHTML = (r.nextActions || [])
+      .sort((a, b) => (a.order || 0) - (b.order || 0))
+      .map(na => `<li>${na.text}</li>`)
+      .join("");
+  }
 })();
 </script>
 
