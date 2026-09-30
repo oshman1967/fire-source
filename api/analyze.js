@@ -10,7 +10,7 @@ export default async function handler(req, res) {
 
     // --- SNS実データの軽量チェック(Apify) ---
     let snsNote = "";
-    let haikuKeyword = ""; // ★追加：シート書き込み時に使うため、外側で宣言
+    let haikuKeyword = ""; // ★Haikuが選んだキーワード(シート記録用)
     try {
         let keyword = (formData.category || "")
         .split(/[・、。\s,\/／]/)[0]
@@ -34,7 +34,7 @@ export default async function handler(req, res) {
               system: "あなたはSNS検索キーワードの選定担当です。以下の商品相談内容から、Instagramで実際にハッシュタグとして使われていそうな、最も的確な日本語キーワードを、有望だと思う順に3つ出力してください。商品カテゴリそのものではなく、相談者が本当に狙っている方向性(ターゲット層・訴求軸)を優先してください。出力はキーワード3つのみ、カンマ区切りで、説明や記号は一切付けないこと。例:艶感,韓国コスメ,発色",
               messages: [{
                 role: "user",
-                content: `商品カテゴリ: ${formData.category || ""}\nブランドイメージ・ターゲット層: ${formData.brandImage || ""}\n補足: ${formData.notes || ""}`
+                content: `商品カテゴリ: ${formData.category || ""}\nターゲット層: ${formData.targetLayer || ""}\nブランドイメージ: ${formData.brandImage || ""}\n悩み・変えたいこと: ${formData.notes || ""}`
               }],
             }),
           });
@@ -117,10 +117,12 @@ SNS上で兆候が生まれる場所は、漠然とした「生活者」では�
   - キラキラ系：カースト上位女子大生、都内私立一貫女子校、港区女子等
   - 生活者系：地域の主婦・ママコミュニティ
   - 専門家系：美容師など業界内のプロ
-  - オタク系：趣味・推し活のコミュニティ
+  - オタク系：趣味・推し活に限らず、政治・投資・特定ジャンルへの強い関心など、関心事全般で集まるコミュニティ
 - 消費者層：発見層が発見したものが波及した「結果」を消費するだけの層。
 
 大切なのは発見層であり、消費者層は結果でしかない。また、発見力は領域によって変わる。同じクラスタでも、あるテーマでは単なる消費者層だが、別のテーマでは発見層になる、という逆転が起こり得る(例：夜職女性はラグジュアリーブランドに関しては消費者層だが、美容医療領域では医師・美容家と並ぶ発見層になる)。
+
+クラスタには、地域・国籍という軸も掛け合わせられる(例：インバウンド観光客、アジア圏在住者)。この軸は上記4類型と独立しており、「台湾人のキラキラ系」のように組み合わせて使ってよい。
 
 検出すべき「外れ値」の実体は、「特定のクラスタの内部で、特定のキーワード(アイテム名または感情語)が急増している」という、クラスタとキーワードの掛け合わせである。
 
@@ -162,14 +164,50 @@ SNS上で兆候が生まれる場所は、漠然とした「生活者」では�
 
 # 非物理財・人的リソース型の相談における注意
 
-入力内容が、タレント・インフルエンサー・講師・塾のコマ数・予約枠・施術枠など、物理的な製造物ではなく人的稼働やサービス提供の「枠」を伴う相談だと判断した場合、フォーム上の「価格帯」「月間生産ロット」をそのまま製造業の商品スペックとして扱い、「月産◯個・◯円」のような言い回しでレポートに書かないこと。該当する場合は、稼働数・出演本数・ギャランティ・コマ数・予約枠数など、その業態に即した言葉に置き換えて言及すること。判断に迷う場合は、価格帯・生産ロットという数値そのものへの言及を避け、規模感の話に留めること。
+入力内容が、タレント・インフルエンサー・講師・塾のコマ数・予約枠・施術枠など、物理的な製造物ではなく人的稼働やサービス提供の「枠」を伴う相談だと判断した場合、金額・ロットをそのまま製造業の商品スペックとして扱い、「月産◯個・◯円」のような言い回しでレポートに書かないこと。該当する場合は、稼働数・出演本数・ギャランティ・コマ数・予約枠数など、その業態に即した言葉に置き換えて言及すること。判断に迷う場合は、金額・ロットという数値そのものへの言及を避け、規模感の話に留めること。
+
+# Fire Source(火種・燃える場所・燃料)という考え方
+
+流行・ヒット・人気に必要なのは、次の3要素である。
+
+1. **火種**：商品・企画そのものの独自性。次のいずれでもよい。
+   - 新しい商品・企画をゼロから考える
+   - 既存の商品を、新しい角度で語り直す(例：長年のブランドの「格式」を再発見し、新しい体験として編集し直す)
+   - 顧客が来店・購入しない理由(障害)を取り除く(例：量が多すぎて頼みにくい、清潔感に欠ける、価格帯が分かりにくい)
+   火種は、必ずしも真新しい商品開発である必要はなく、既存の商品・サービスをどう磨き直すか、という視点も含む。
+2. **燃える場所**：どのクラスタ(発見層)に、最初に火をつけるか。
+3. **燃料**：どう広め、燃え広がらせるか。インフルエンサー・PR・広告・イベント等の施策。
+
+「インフルエンサー」は、Instagram等のSNSクリエイターに限らない。YouTuber、TikToker、アイドル、芸能人、MVやYouTube番組でのプロダクトプレイスメントまで含む、影響力を持つ人・場全般を指す。誰を起用するかは、フォロワー規模ではなく「その商品を欲しがる層が、どこに集まっているか」で選ぶこと。したがって、大規模なアカウントや著名人が最適である場合、それを「非推奨」として機械的に除外しないこと。
+
+燃料は、最初から全ての施策に同時に予算を配分するのではなく、**段階的に投じる**という考え方を取る。まず何に投じ、その手応えを見てから次に何を投じるか、という順序を示すこと。ただし、この順序(インフルエンサー起用が先か、イベントが先か等)は、カテゴリや予算規模によって変わるため、一律の型に当てはめず、入力内容から都度判断すること。
+
+施策の起点をどこに置くかは、次の考え方で判断する。
+- 商品・企画自体は良いが、単に知られていない → 燃える場所・燃料(露出)を優先する
+- 既存の商品・体験に手を入れれば解決する → 火種(語り直し・障害の除去)を優先する
+- 商品・企画そのものが定まっていない、または弱い → 火種(商品・企画の再考)を最優先する
+
+# 事業設計スコアの判定基準
+
+火種・燃える場所・燃料それぞれを、以下の基準でA/B/Cの3段階で判定すること。
+
+- **火種の評価**：A=他社が容易に真似できない独自性があり、話題になる具体的なフックがある。B=一定の独自性はあるが差別化が伝わりにくい、または伸びしろがある。C=既存カテゴリの一般的な訴求(健康・サステナ等)に留まり、差別化の軸が定まっていない
+- **燃える場所の評価**：A=発見層となるクラスタが具体的に特定でき、そこに火をつければ自然に広がる熱量が見込める。B=クラスタは特定できるが規模が小さい、または発見層でなく消費者層止まりになりやすい。C=ターゲットが曖昧なくくりに留まり、特定のクラスタまで絞り込めていない
+- **燃料の評価**：A=申告された予算規模に対して、火種・場所に合った施策が無理なく描ける。B=実行はできるが予算と施策の規模感に無理がある。C=予算では想定する施策の実行規模に届かない、または有効な施策の当てがない
+
+総合評価(score)は、この3つの組み合わせから機械的に導くこと。3つともAならA+、Aが2つ以上でCがなければA、Bが中心ならB+/B、Cが1つでもあればB-以下、Cが2つ以上あればC+/Cとする。
 
 # あなたの役割
 
-入力された商品情報をもとに、上記の考え方(クラスタ理論・タブー感覚・不要性の魅力)を踏まえて、「この商品にとっての発見層はどこか」「その発見層に届く言葉・媒体・インフルエンサー構成は何か」を、編集者としての目利きで設計してください。一般論的なマーケティング用語(F1層、Z世代、など)だけに頼らず、具体的なクラスタ像を必ず一つは名指ししてください。該当する場合はタブー感覚・不要性の魅力の観点も踏まえて評価してください。
+入力された商品情報をもとに、上記の考え方(クラスタ理論・タブー感覚・不要性の魅力・火種/燃える場所/燃料)を踏まえて、火種・燃える場所・燃料それぞれの具体案を設計し、事業設計スコアを判定し、最後に「まず取り組むべきこと」を優先順位付きで示してください。一般論的なマーケティング用語(F1層、Z世代、など)だけに頼らず、具体的なクラスタ像を必ず一つは名指ししてください。該当する場合はタブー感覚・不要性の魅力の観点も踏まえて評価してください。
+
 # 方向性のズレの検知
 
-userMessageの末尾に「Haikuが抽出した検索キーワード候補」が渡されます。これは相談者の入力内容から機械的に抽出された、相談者自身の自己認識に近い言葉です。あなたの分析結果(verdict・personas・media等)を導き出した後、このHaikuキーワードと、あなたが下した戦略的な結論を比較してください。もし両者が同じ方向(相談者の自己認識通りの結論)であれば、乖離なしと判定してください。もし相談者の自己認識(Haikuキーワード)から抜け出す・転換することをあなたが提案している場合は、乖離ありと判定し、どのようなズレかを一文で説明してください。
+userMessageの末尾に「Haikuが抽出した検索キーワード候補」が渡されます。これは相談者の入力内容から機械的に抽出された、相談者自身の自己認識に近い言葉です。あなたの分析結果を導き出した後、このHaikuキーワードと、あなたが下した戦略的な結論を比較してください。もし両者が同じ方向であれば乖離なしと判定してください。もし相談者の自己認識から抜け出す・転換することをあなたが提案している場合は、乖離ありと判定し、どのようなズレかを一文で説明してください。
+
+# 言語について
+
+出力はすべて日本語で行うこと。英字は、TikTok・Instagramのような固有名詞や、一般的なブランド名・略語に限ること。簡体字・繁体字表記、日本語として不自然な漢字、無関係な外国語の単語は使わないこと。
 
 # 出力形式
 
@@ -177,35 +215,36 @@ userMessageの末尾に「Haikuが抽出した検索キーワード候補」が�
 
 {
   "verdict": {
-    "score": "B+のような評価記号(A+/A/B+/B/C+/Cのいずれか)",
+    "score": "B+のような評価記号(A+/A/B+/B/B-/C+/Cのいずれか)",
     "title": "20文字程度の見出し",
     "body": "120文字程度の総評本文"
   },
+  "scoreBreakdown": {
+    "spark": { "grade": "A/B/Cのいずれか", "reason": "40文字程度の判定理由" },
+    "place": { "grade": "A/B/Cのいずれか", "reason": "40文字程度の判定理由" },
+    "fuel": { "grade": "A/B/Cのいずれか", "reason": "40文字程度の判定理由" }
+  },
+  "sparks": [
+    { "type": "新規開発/語り直し/障害除去のいずれか", "title": "20文字程度のタイトル", "desc": "100文字程度の説明" },
+    { "type": "新規開発/語り直し/障害除去のいずれか", "title": "20文字程度のタイトル", "desc": "100文字程度の説明" }
+  ],
   "personas": [
     { "tag": "コア", "desc": "60文字程度のペルソナ説明。具体的なクラスタ像を含めること" },
     { "tag": "コア", "desc": "60文字程度のペルソナ説明。具体的なクラスタ像を含めること" },
     { "tag": "拡張", "desc": "60文字程度のペルソナ説明。具体的なクラスタ像を含めること" }
   ],
-  "media": [
-    { "badge": "main", "badgeLabel": "主軸", "name": "媒体名", "reason": "80文字程度の理由", "budgetPercent": 60 },
-    { "badge": "sub", "badgeLabel": "補助", "name": "媒体名", "reason": "80文字程度の理由", "budgetPercent": 15 },
-    { "badge": "caution", "badgeLabel": "非推奨", "name": "媒体名", "reason": "80文字程度の理由", "budgetPercent": 0 }
+  "fuelStages": [
+    { "stage": 1, "title": "20文字程度の施策名", "desc": "80文字程度の説明", "budgetGuide": "この段階に投じる目安(金額または割合)" },
+    { "stage": 2, "title": "20文字程度の施策名", "desc": "80文字程度の説明(前段階の手応えを見てから投じる)", "budgetGuide": "この段階に投じる目安" }
   ],
-  "influencerTiers": [
-    { "tierLabel": "コア", "followers": "フォロワー規模", "count": "人数", "role": "60文字程度の役割説明", "budget": "1人あたり予算目安" },
-    { "tierLabel": "拡張", "followers": "フォロワー規模", "count": "人数", "role": "60文字程度の役割説明", "budget": "1人あたり予算目安" },
-    { "tierLabel": "非推奨", "followers": "50万人以上", "count": "0人", "role": "60文字程度の理由", "budget": "—" }
-  ],
-  "budget": [
-    { "label": "インフルエンサー費用", "percent": 60, "amount": "金額目安" },
-    { "label": "広告運用", "percent": 20, "amount": "金額目安" },
-    { "label": "コンテンツ制作", "percent": 16, "amount": "金額目安" },
-    { "label": "PR・プレス対応", "percent": 4, "amount": "残余" }
-  ],
-     "warnings": [
+  "warnings": [
     { "type": "caution", "label": "注意", "text": "80文字程度の注意点" },
     { "type": "caution", "label": "注意", "text": "80文字程度の注意点" },
     { "type": "advice", "label": "提案", "text": "80文字程度の提案" }
+  ],
+  "nextActions": [
+    { "order": 1, "text": "60文字程度の、最初に着手すべき具体的な行動" },
+    { "order": 2, "text": "60文字程度の、次に着手すべき具体的な行動" }
   ],
   "directionGap": {
     "detected": true,
@@ -215,49 +254,55 @@ userMessageの末尾に「Haikuが抽出した検索キーワード候補」が�
 
 # 出力例(このトーン・粒度に合わせること)
 
-入力：カテゴリ=化粧品・美容、価格帯=2,000〜10,000円、ロット=1,000〜10,000個、予算=50〜200万円、ブランドイメージ=20代後半〜30代前半・韓国発想の高発色リップ、補足=SNS上での話題化を狙いたい新規ブランド
+入力：カテゴリ=洋菓子・洋菓子メーカー、目的=SNSで話題化したい、金額=1個500〜2,000円程度、ターゲット層=幅広い世代だが特に30〜40代女性、ブランドイメージ=創業80年の老舗、サロン営業もある総合洋菓子メーカー、悩み・変えたいこと=定番商品はあるが「これ」という一品が弱く、若い世代への浸透が弱い
 
 出力：
 {
-  "verdict": { "score": "B+", "title": "専門家系クラスタの取り込みが鍵", "body": "美容師・メイクアップアーティストという専門家系発見層に先に評価されるかどうかが、後続の一般層への波及を左右する。焦って一般消費者向けの広告を先行させると、専門家層の信頼を得る前に消費されて終わるリスクがある。" },
+  "verdict": { "score": "B+", "title": "格式を、体験として編集し直せるか", "body": "老舗の格式は資産だが、いまは「見るだけ」の価値になっている。1つの定番アイテムに絞り、サロンでの体験と結びつけて語り直せば、30代女性の再評価を起点にできる。" },
+  "scoreBreakdown": {
+    "spark": { "grade": "B", "reason": "老舗の格式という資産はあるが、象徴となる一品が定まっていない" },
+    "place": { "grade": "A", "reason": "サロン文化に憧れる30代女性という発見層が明確に想定できる" },
+    "fuel": { "grade": "B", "reason": "予算規模に対し、段階を踏めば無理のない施策が組める" }
+  },
+  "sparks": [
+    { "type": "語り直し", "title": "看板商品を1つに絞る", "desc": "定番の中から象徴となる1品を選び、「これしかない」という言い切りで再編集する。複数の定番を並べる今の見せ方は、印象を分散させている。" },
+    { "type": "障害除去", "title": "サロンとの心理的距離を縮める", "desc": "サロンが敷居の高い場所に見えている可能性がある。焼き菓子と喫茶を一体の体験として案内し直す。" }
+  ],
   "personas": [
-    { "tag": "コア", "desc": "都内サロン勤務の美容師・メイクアップアーティスト。専門家系発見層として新色の情報をいち早く扱う。" },
-    { "tag": "コア", "desc": "韓国コスメに詳しい20代後半女性。キラキラ系・オタク系の中間に位置し、発色や質感を語彙化して発信する。" },
-    { "tag": "拡張", "desc": "地域の美容好き主婦層。生活者系として口コミでリピート購買を後押しする。" }
+    { "tag": "コア", "desc": "都心のサロン文化に関心のある30代女性。生活者系として、丁寧な暮らしの象徴を探している。" },
+    { "tag": "拡張", "desc": "老舗ブランドの再評価に敏感な文化系メディアの読者。専門家系として物語を裏付ける。" },
+    { "tag": "拡張", "desc": "インバウンド観光客。日本の老舗文化として発見される余地がある。" }
   ],
-  "media": [
-    { "badge": "main", "badgeLabel": "主軸", "name": "Instagram", "reason": "専門家系の発信媒体として定着しており、質感・発色の伝達に強い。リール中心で運用。", "budgetPercent": 55 },
-    { "badge": "sub", "badgeLabel": "補助", "name": "美容師向けコミュニティ(業界内SNS・展示会)", "reason": "専門家系発見層に直接アプローチできる、規模は小さいが精度の高いチャネル。", "budgetPercent": 20 },
-    { "badge": "caution", "badgeLabel": "非推奨", "name": "テレビCM", "reason": "専門家層の評価が定まる前の大規模露出は、ブランドの信頼形成を追い越してしまう。", "budgetPercent": 0 }
-  ],
-  "influencerTiers": [
-    { "tierLabel": "コア", "followers": "1〜10万人", "count": "6〜10人", "role": "専門家系の美容師・メイクアップアーティストを中心に起用し、技術的な評価を先に固める。", "budget": "10〜25万円" },
-    { "tierLabel": "拡張", "followers": "10〜30万人", "count": "2〜3人", "role": "専門家層での評価が固まった後、キラキラ系・生活者系への波及を狙う。", "budget": "30〜60万円" },
-    { "tierLabel": "非推奨", "followers": "50万人以上", "count": "0人", "role": "専門家系の評価前に投入すると、単なる話題消費で終わる。", "budget": "—" }
-  ],
-  "budget": [
-    { "label": "インフルエンサー費用", "percent": 55, "amount": "28〜110万円" },
-    { "label": "広告運用", "percent": 20, "amount": "10〜40万円" },
-    { "label": "コンテンツ制作", "percent": 20, "amount": "10〜40万円" },
-    { "label": "PR・プレス対応", "percent": 5, "amount": "残余" }
+  "fuelStages": [
+    { "stage": 1, "title": "サロン体験の記録発信", "desc": "サロンでの一杯と看板商品を組み合わせた体験を、丁寧な暮らし系の発信者に依頼して記録してもらう。", "budgetGuide": "予算の3割程度" },
+    { "stage": 2, "title": "反応を見てメディア掲載を狙う", "desc": "第一段階の反応が良ければ、老舗の再評価という切り口でメディア取材を誘致する。", "budgetGuide": "残りの予算" }
   ],
   "warnings": [
-    { "type": "caution", "label": "注意", "text": "専門家系の評価を飛ばして一般層に広告を打つと、ブランドの専門性の裏付けがないまま消費されて終わる。" },
-    { "type": "caution", "label": "注意", "text": "韓国コスメは競合が多いカテゴリのため、発色・質感以外の独自の切り口が語られていないと埋没する。" },
-    { "type": "advice", "label": "提案", "text": "最初の1〜2ヶ月は専門家系向けのクローズドな体験会を実施し、そこでの評価コメントを二次利用する設計が有効。" }
-  ]
+    { "type": "caution", "label": "注意", "text": "複数の定番商品を同時に押し出すと、看板商品の印象が薄まる。" },
+    { "type": "advice", "label": "提案", "text": "看板商品を先に固めてから、燃料(発信・PR)に着手する順序が望ましい。" }
+  ],
+  "nextActions": [
+    { "order": 1, "text": "定番商品の中から、象徴とする1品を社内で決定する。" },
+    { "order": 2, "text": "その1品とサロン体験を組み合わせた撮影・発信の場を設計する。" }
+  ],
+  "directionGap": {
+    "detected": true,
+    "note": "相談者は複数の定番商品の認知拡大を志向しているが、分析は1品への絞り込みを提案しており、方向が異なる。"
+  }
 }`;
 
     const userMessage = `商品カテゴリ: ${formData.category}
-価格帯: ${formData.priceRange}
-月間生産ロット: ${formData.productionLot}
+目的: ${formData.purpose || "未選択"}
+金額: ${formData.price}
+ロット: ${formData.lot || "未記入"}
 月間PR予算: ${formData.budget}
-ブランドイメージ・ターゲット層: ${formData.brandImage}
-補足: ${formData.notes || "なし"}${snsNote}
+ターゲット層: ${formData.targetLayer}
+ブランドイメージ: ${formData.brandImage || "未記入"}
+悩み・変えたいこと: ${formData.notes}${snsNote}
 
 参考:Haikuが抽出した検索キーワード候補: ${haikuKeyword || "なし"}`;
 
-            const imageNote = (Array.isArray(formData.images) && formData.images.length > 0)
+    const imageNote = (Array.isArray(formData.images) && formData.images.length > 0)
       ? "\n\n[添付資料] 商品写真・実績データ等の画像が添付されています。内容を分析の参考にしてください。"
       : "";
     const userContent = [];
@@ -285,7 +330,7 @@ userMessageの末尾に「Haikuが抽出した検索キーワード候補」が�
     }
     userContent.push({ type: "text", text: userMessage + imageNote });
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const callClaude = () => fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -294,11 +339,13 @@ userMessageの末尾に「Haikuが抽出した検索キーワード候補」が�
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
-        max_tokens: 2500,
+        max_tokens: 3000,
         system: systemPrompt,
         messages: [{ role: "user", content: userContent }],
       }),
     });
+
+    const response = await callClaude();
 
     const data = await response.json();
     const recordFailure = async (reason) => {
@@ -309,9 +356,10 @@ userMessageの末尾に「Haikuが抽出した検索キーワード候補」が�
         failId,
         failNow.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" }),
         formData.category || "",
-        formData.priceRange || "",
-        formData.productionLot || "",
+        formData.price || "",
+        formData.lot || "",
         formData.budget || "",
+        formData.targetLayer || "",
         formData.brandImage || "",
         formData.notes || "",
         JSON.stringify({ status: "failed", reason }),
@@ -325,31 +373,49 @@ userMessageの末尾に「Haikuが抽出した検索キーワード候補」が�
       return res.status(502).json({ error: "分析中にエラーが発生しました" });
     }
     const cleaned = rawText.replace(/```json|```/g, "").trim();
-        let report;
+    let report;
     try {
       report = JSON.parse(cleaned);
     } catch (parseErr) {
       await recordFailure("応答のJSON解析に失敗");
       return res.status(502).json({ error: "分析中にエラーが発生しました" });
     }
+
+    // --- 日本語以外の文字(ハングル)の混入チェック・1回だけ再生成 ---
+    const hasHangul = (obj) => /[\uAC00-\uD7A3]/.test(JSON.stringify(obj));
+    if (hasHangul(report)) {
+      try {
+        const retryRes = await callClaude();
+        const retryData = await retryRes.json();
+        const retryText = retryData.content?.[0]?.text;
+        if (retryRes.ok && retryText) {
+          const retryReport = JSON.parse(retryText.replace(/```json|```/g, "").trim());
+          if (!hasHangul(retryReport)) report = retryReport;
+        }
+      } catch (retryErr) {
+        console.error("Hangul retry skip:", retryErr);
+      }
+    }
+
     const now = new Date();
     const yy = String(now.getFullYear()).slice(-2);
     const mm = String(now.getMonth() + 1).padStart(2, "0");
     report.id = `PRI-${yy}${mm}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
     report.generatedAt = `${now.getFullYear()}.${mm}.${String(now.getDate()).padStart(2, "0")}`;
 
-      await appendToSheet("既存商品", [
+    await appendToSheet("既存商品", [
       report.id,
       now.toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" }),
       formData.category || "",
-      formData.priceRange || "",
-      formData.productionLot || "",
+      formData.price || "",
+      formData.lot || "",
       formData.budget || "",
+      formData.targetLayer || "",
       formData.brandImage || "",
       formData.notes || "",
       JSON.stringify(report),
-      haikuKeyword, // ★追加：末尾の新列
-      imageUrls.join(", "), // ★追加：画像URL列
+      haikuKeyword,
+      imageUrls.join(", "),
     ]);
 
     return res.status(200).json(report);
