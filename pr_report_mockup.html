@@ -396,6 +396,94 @@
     color: #fff;
   }
 
+
+  /* Score breakdown pills */
+  .score-breakdown {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+  .score-pill {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    border: 0.5px solid #444;
+    border-radius: 20px;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.72rem;
+    color: #ccc;
+  }
+  .score-pill .score-pill-label { color: #999; }
+  .score-pill .score-pill-grade {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--accent);
+  }
+  .score-pill .score-pill-reason {
+    font-size: 0.65rem;
+    color: #888;
+    display: block;
+    width: 100%;
+    margin-top: 0.15rem;
+  }
+
+  /* Fuel stages */
+  .fuel-stage-card {
+    border: 0.5px solid var(--rule);
+    border-radius: 2px;
+    padding: 1.25rem 1.5rem;
+    background: var(--bg-white);
+    margin-bottom: 0.9rem;
+    position: relative;
+    padding-left: 3rem;
+  }
+  .fuel-stage-number {
+    position: absolute;
+    left: 1rem;
+    top: 1.2rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    color: var(--accent);
+    font-style: italic;
+  }
+  .fuel-stage-card h3 { font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--ink); }
+  .fuel-stage-card p.fuel-stage-desc { font-size: 0.82rem; line-height: 1.7; color: var(--ink-mid); margin-bottom: 0.5rem; }
+  .fuel-stage-budget { font-size: 0.72rem; color: var(--accent); letter-spacing: 0.03em; }
+
+  /* Next actions */
+  .next-actions-list {
+    list-style: none;
+    counter-reset: nextaction;
+  }
+  .next-actions-list li {
+    counter-increment: nextaction;
+    position: relative;
+    padding: 0.9rem 0 0.9rem 2.5rem;
+    border-bottom: 0.5px solid var(--rule);
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+  .next-actions-list li:last-child { border-bottom: none; }
+  .next-actions-list li::before {
+    content: counter(nextaction);
+    position: absolute;
+    left: 0;
+    top: 0.8rem;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+  }
+
   @media (max-width: 640px) {
     header { padding: 1.25rem 1.5rem;  flex-wrap: wrap; }
     .pr-badge { order: 3; margin-top: 0.4rem; }
@@ -473,16 +561,32 @@
       <div class="brief-item-value" id="brief-category">ファッション・アパレル</div>
     </div>
     <div class="brief-item">
+      <div class="brief-item-label">目的</div>
+      <div class="brief-item-value" id="brief-purpose">—</div>
+    </div>
+    <div class="brief-item">
       <div class="brief-item-label">価格帯</div>
       <div class="brief-item-value" id="brief-price">10,000〜50,000円</div>
     </div>
     <div class="brief-item">
-      <div class="brief-item-label">月間ロット</div>
-      <div class="brief-item-value" id="brief-lot">1,000〜10,000個</div>
-    </div>
-    <div class="brief-item">
       <div class="brief-item-label">月間PR予算</div>
       <div class="brief-item-value" id="brief-budget">200〜500万円</div>
+    </div>
+  </div>
+  <div class="brief-bar">
+    <div class="brief-item">
+      <div class="brief-item-label">ターゲット層</div>
+      <div class="brief-item-value" id="brief-target" style="font-size:0.8rem; font-weight:300; letter-spacing:0;">—</div>
+    </div>
+    <div class="brief-item">
+      <div class="brief-item-label">月間ロット</div>
+      <div class="brief-item-value" id="brief-lot" style="font-size:0.8rem; font-weight:300; letter-spacing:0;">—</div>
+    </div>
+  </div>
+  <div class="brief-bar" style="border-top:none;">
+    <div class="brief-item" style="flex:1 1 100%; border-right:none;">
+      <div class="brief-item-label">ご相談したい内容</div>
+      <div class="brief-item-value" id="brief-notes" style="font-size:0.8rem; font-weight:300; letter-spacing:0;">—</div>
     </div>
   </div>
 
@@ -495,12 +599,19 @@
         <div class="verdict-text">
       <h2 id="verdict-title">予算・ロットのバランスは良好。<br>ただしブランドイメージのリスクあり。</h2>
       <p id="verdict-body">生産ロットに対してPR予算は適切な水準です。ただし既存ブランドのため、新規認知獲得より先に「信頼の形成」を破壊しない設計が必要です。メガインフルエンサーへの集中投下は、このフェーズではまだ時期尚早であり、非推奨です。</p>
+      <div class="score-breakdown" id="score-breakdown"></div>
     </div>
   </div>
 
-  <!-- Persona callout -->
+  <!-- 火種:商品・企画の提案 -->
+  <div class="section">
+    <p class="section-label">火種：商品・企画の提案</p>
+    <div class="media-grid" id="spark-grid"></div>
+  </div>
+
+  <!-- Persona callout(燃える場所) -->
   <div class="persona-callout">
-    <p class="persona-label">こんなインフルエンサーがベスト</p>
+    <p class="persona-label">燃える場所：狙うべき客層</p>
     　 <div class="persona-grid" id="persona-grid">
       <div class="persona-card">
         <div class="persona-tag">コア</div>
@@ -518,95 +629,10 @@
     <p class="persona-note">※実在の個人・事務所名の指定はPlan B（ブッキング支援）でご案内します。</p>
   </div>
 
-  <!-- Media -->
+  <!-- 燃料:広め方の提案 -->
   <div class="section">
-    <p class="section-label">推奨媒体</p>
-      <div class="media-grid" id="media-grid">
-      <div class="media-card primary">
-        <div class="media-badge main">主軸</div>
-        <div class="media-name">Instagram</div>
-        <div class="media-reason">30代女性の購買意思決定に最も直結。高級感の演出とUGC蓄積の両立が可能。リール・ストーリーズを活用。</div>
-        <div class="media-budget">予算配分：60%</div>
-      </div>
-      <div class="media-card">
-        <div class="media-badge sub">補助</div>
-        <div class="media-name">TikTok</div>
-        <div class="media-reason">認知拡大の補助として活用。ただし高級感の演出には限界があるため、予算は絞る。若年層への将来的な布石として位置づける。</div>
-        <div class="media-budget">予算配分：15%</div>
-      </div>
-      <div class="media-card">
-        <div class="media-badge caution">非推奨</div>
-        <div class="media-name">テレビ・雑誌</div>
-        <div class="media-reason">ブランド新規イメージの信頼形成前に大規模露出すると在庫・対応が追いつかないリスクがある。6ヶ月以降に検討。</div>
-        <div class="media-budget">予算配分：0%（現時点）</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Influencer -->
-  <div class="section">
-    <p class="section-label">インフルエンサー構成（逆算設計）</p>
-    <table class="inf-table inf-table-tier">
-      <thead>
-        <tr>
-          <th>ティア</th>
-          <th>フォロワー規模</th>
-          <th>人数</th>
-          <th>役割</th>
-          <th>1人あたり予算目安</th>
-        </tr>
-      </thead>
-      <tbody id="inf-tbody">
-        <tr>
-          <td data-label="ティア"><span class="tier-badge tier-core">コア</span></td>
-          <td data-label="フォロワー規模">5〜20万人</td>
-          <td data-label="人数">5〜8人</td>
-          <td data-label="役割">信頼形成・UGC蓄積。エンゲージメント率が高く、フォロワーとの距離が近い。</td>
-          <td data-label="1人あたり予算目安">15〜30万円</td>
-        </tr>
-        <tr>
-          <td data-label="ティア"><span class="tier-badge tier-mid">拡張</span></td>
-          <td data-label="フォロワー規模">20〜50万人</td>
-          <td data-label="人数">2〜3人</td>
-          <td data-label="役割">認知拡大。コア層での実績ができてから投入する。</td>
-          <td data-label="1人あたり予算目安">50〜80万円</td>
-        </tr>
-        <tr>
-          <td data-label="ティア" style="color:var(--ink-light)">非推奨</td>
-          <td data-label="フォロワー規模" style="color:var(--ink-light)">100万人以上</td>
-          <td data-label="人数" style="color:var(--ink-light)">0人</td>
-          <td data-label="役割" style="color:var(--ink-light)">ブランドイメージの信頼が形成される前に使うと逆効果。最低6ヶ月以降に再検討。</td>
-          <td data-label="1人あたり予算目安" style="color:var(--ink-light)">—</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Budget breakdown -->
-  <div class="section">
-    <p class="section-label">予算配分（月200〜500万円）</p>
-      <div class="budget-breakdown" id="budget-breakdown">
-      <div class="budget-row">
-        <div class="budget-row-label">インフルエンサー費用</div>
-        <div class="budget-bar-wrap"><div class="budget-bar" style="width:60%"></div></div>
-        <div class="budget-amount">150〜300万円</div>
-      </div>
-      <div class="budget-row">
-        <div class="budget-row-label">Instagram広告運用</div>
-        <div class="budget-bar-wrap"><div class="budget-bar" style="width:20%; background:#c9b49a"></div></div>
-        <div class="budget-amount">40〜100万円</div>
-      </div>
-      <div class="budget-row">
-        <div class="budget-row-label">コンテンツ制作</div>
-        <div class="budget-bar-wrap"><div class="budget-bar" style="width:16%; background:#d8d2c8"></div></div>
-        <div class="budget-amount">30〜80万円</div>
-      </div>
-      <div class="budget-row">
-        <div class="budget-row-label">PR・プレス対応</div>
-        <div class="budget-bar-wrap"><div class="budget-bar" style="width:4%; background:#ebe7e2"></div></div>
-        <div class="budget-amount">残余</div>
-      </div>
-    </div>
+    <p class="section-label">燃料：広め方の提案</p>
+    <div id="fuel-stage-list"></div>
   </div>
 
   <!-- Warnings -->
@@ -626,6 +652,12 @@
         <div class="warning-text">最初の3ヶ月はマイクロインフルエンサーによる信頼蓄積フェーズ。4ヶ月目以降にミドルへ拡張する段階的アプローチが、このロット・価格帯には最適です。</div>
       </div>
     </div>
+  </div>
+
+  <!-- まず取り組むべきこと -->
+  <div class="section">
+    <p class="section-label">まず取り組むべきこと</p>
+    <ol class="next-actions-list" id="next-actions-list"></ol>
   </div>
 
   <!-- Locked section -->
@@ -680,81 +712,97 @@
     document.getElementById("report-eyebrow").textContent = `Analysis Report — ${r.generatedAt}`;
   }
 
-  // brief summary (入力内容の反映)
+  // brief summary (入力内容の反映、全項目)
   const formRaw = sessionStorage.getItem("fireSourceFormData");
   if (formRaw) {
     try {
       const f = JSON.parse(formRaw);
-      const lotLabels = { "100": "〜100個", "1000": "100〜1,000個", "10000": "1,000〜10,000個", "100000": "10,000〜100,000個", "over": "100,000個以上" };
       const budgetLabels = { "50": "〜50万円", "200": "50〜200万円", "500": "200〜500万円", "1000": "500万〜1,000万円", "over": "1,000万円以上" };
       document.getElementById("brief-category").textContent = f.category || "—";
-      document.getElementById("brief-price").textContent = f.priceRange || "—";
-      document.getElementById("brief-lot").textContent = lotLabels[f.productionLot] || f.productionLot || "—";
+      document.getElementById("brief-purpose").textContent = f.purpose || "—";
+      document.getElementById("brief-price").textContent = f.price || "—";
       document.getElementById("brief-budget").textContent = budgetLabels[f.budget] || f.budget || "—";
+      document.getElementById("brief-target").textContent = f.targetLayer || "—";
+      document.getElementById("brief-lot").textContent = f.lot || "—";
+      document.getElementById("brief-notes").textContent = f.notes || "—";
     } catch (e) {}
   }
 
   // verdict
-  document.getElementById("verdict-score").innerHTML = r.verdict.score.replace(/\+/g, "<span>+</span>");
+  document.getElementById("verdict-score").innerHTML = r.verdict.score.replace(/[+-]/g, "<span>$&</span>");
   document.getElementById("verdict-title").textContent = r.verdict.title;
   document.getElementById("verdict-body").textContent = r.verdict.body;
 
-  // personas
+  // 事業設計スコアの内訳(火種・燃える場所・燃料)
+  if (r.scoreBreakdown) {
+    const labels = { spark: "火種", place: "燃える場所", fuel: "燃料" };
+    const order = ["spark", "place", "fuel"];
+    const breakdown = document.getElementById("score-breakdown");
+    breakdown.innerHTML = order
+      .filter(key => r.scoreBreakdown[key])
+      .map(key => {
+        const b = r.scoreBreakdown[key];
+        return `
+          <div class="score-pill">
+            <span class="score-pill-label">${labels[key]}</span>
+            <span class="score-pill-grade">${b.grade}</span>
+            <span class="score-pill-reason">${b.reason || ""}</span>
+          </div>
+        `;
+      }).join("");
+  }
+
+  // 火種(sparks)
+  const sparkGrid = document.getElementById("spark-grid");
+  if (sparkGrid) {
+    sparkGrid.innerHTML = (r.sparks || []).map(s => `
+      <div class="media-card">
+        <div class="media-badge badge-rec">${s.type || ""}</div>
+        <h3>${s.title}</h3>
+        <p>${s.desc}</p>
+      </div>
+    `).join("");
+  }
+
+  // personas(燃える場所)
   const personaGrid = document.getElementById("persona-grid");
-  personaGrid.innerHTML = r.personas.map(p => `
+  personaGrid.innerHTML = (r.personas || []).map(p => `
     <div class="persona-card">
       <div class="persona-tag">${p.tag}</div>
       <p class="persona-desc">${p.desc}</p>
     </div>
   `).join("");
 
-  // media
-  const mediaGrid = document.getElementById("media-grid");
-  mediaGrid.innerHTML = r.media.map(m => `
-    <div class="media-card ${m.badge === "main" ? "primary" : ""}">
-      <div class="media-badge ${m.badge}">${m.badgeLabel}</div>
-      <div class="media-name">${m.name}</div>
-      <div class="media-reason">${m.reason}</div>
-      <div class="media-budget">予算配分：${m.budgetPercent}%</div>
-    </div>
-  `).join("");
-
-  // influencer tiers
-  const infTbody = document.getElementById("inf-tbody");
-  infTbody.innerHTML = r.influencerTiers.map(t => {
-    const tierClass = t.tierLabel === "コア" ? "tier-core" : (t.tierLabel === "拡張" ? "tier-mid" : "");
-    const dim = t.tierLabel === "非推奨" ? 'style="color:var(--ink-light)"' : "";
-    const badge = tierClass ? `<span class="tier-badge ${tierClass}">${t.tierLabel}</span>` : t.tierLabel;
-    return `
-      <tr>
-        <td data-label="ティア" ${dim}>${badge}</td>
-        <td data-label="フォロワー規模" ${dim}>${t.followers}</td>
-        <td data-label="人数" ${dim}>${t.count}</td>
-        <td data-label="役割" ${dim}>${t.role}</td>
-        <td data-label="1人あたり予算目安" ${dim}>${t.budget}</td>
-      </tr>
-    `;
-  }).join("");
-
-  // budget
-  const budgetColors = ["var(--accent)", "#c9b49a", "#d8d2c8", "#ebe7e2"];
-  const budgetBreakdown = document.getElementById("budget-breakdown");
-  budgetBreakdown.innerHTML = r.budget.map((b, i) => `
-    <div class="budget-row">
-      <div class="budget-row-label">${b.label}</div>
-      <div class="budget-bar-wrap"><div class="budget-bar" style="width:${b.percent}%; background:${budgetColors[i] || "var(--accent)"}"></div></div>
-      <div class="budget-amount">${b.amount}</div>
-    </div>
-  `).join("");
+  // 燃料の段階的投下(fuelStages)
+  const fuelStageList = document.getElementById("fuel-stage-list");
+  if (fuelStageList) {
+    fuelStageList.innerHTML = (r.fuelStages || []).map(fs => `
+      <div class="fuel-stage-card">
+        <div class="fuel-stage-number">${fs.stage}</div>
+        <h3>${fs.title}</h3>
+        <p class="fuel-stage-desc">${fs.desc}</p>
+        <p class="fuel-stage-budget">${fs.budgetGuide || ""}</p>
+      </div>
+    `).join("");
+  }
 
   // warnings
   const warningList = document.getElementById("warning-list");
-  warningList.innerHTML = r.warnings.map(w => `
+  warningList.innerHTML = (r.warnings || []).map(w => `
     <div class="warning-item ${w.type === "advice" ? "advice" : ""}">
       <div class="warning-icon" ${w.type === "advice" ? 'style="color:var(--green)"' : ""}>${w.label}</div>
       <div class="warning-text">${w.text}</div>
     </div>
   `).join("");
+
+  // まず取り組むべきこと(nextActions)
+  const nextActionsList = document.getElementById("next-actions-list");
+  if (nextActionsList) {
+    nextActionsList.innerHTML = (r.nextActions || [])
+      .sort((a, b) => (a.order || 0) - (b.order || 0))
+      .map(na => `<li>${na.text}</li>`)
+      .join("");
+  }
 })();
 </script>
 
