@@ -142,6 +142,36 @@
     border-radius: 1px;
     white-space: nowrap;
   }
+
+  .choice-fit {
+    list-style: none;
+    margin-top: 0.9rem;
+    padding-top: 0.9rem;
+    border-top: 0.5px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .choice-fit-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 0.2rem;
+  }
+  .choice-fit li {
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: var(--ink-mid);
+    padding-left: 1rem;
+    position: relative;
+  }
+  .choice-fit li::before {
+    content: "・";
+    position: absolute;
+    left: 0;
+  }
+
   @media (max-width: 700px) {
     .choice-grid { grid-template-columns: 1fr; gap: 1.5rem; }
     .choice-title br { display: none; }
@@ -171,6 +201,11 @@
         <p class="choice-label">New Product</p>
         <h2 class="choice-title">新商品のアイデアを<br>お探しですか？</h2>
         <p class="choice-desc">まだ商品が決まっていない段階から。御社の強みと、いま伸び始めている関心層を突き合わせ、これから作るべきものを設計します。</p>
+        <ul class="choice-fit">
+          <li class="choice-fit-label" style="list-style:none;">こんな方へ</li>
+          <li>商品はまだないが、強みや設備を活かして何か始めたい</li>
+          <li>新しい客層向けに、今の事業とは別の商品・企画を考えたい</li>
+        </ul>
         <div class="choice-go">この相談で進む →</div>
       </div>
     </a>
@@ -180,7 +215,13 @@
       <div class="choice-body">
         <p class="choice-label">New Market</p>
         <h2 class="choice-title">既存商品の新規マーケットを<br>お探しですか？</h2>
-        <p class="choice-desc">すでにある商品を、まだ届いていない層へ。商品情報をもとに、最適な媒体・インフルエンサー構成・予算配分を設計します。</p>
+        <p class="choice-desc">すでにある商品・サービスを、新しい客層に届くよう磨き直します。商品・企画の見直しから、媒体・インフルエンサー構成まで設計します。</p>
+        <ul class="choice-fit">
+          <li class="choice-fit-label" style="list-style:none;">こんな方へ</li>
+          <li>すでに販売している商品・サービスの、売り方や届け方を見直したい</li>
+          <li>売れ行きが伸び悩んでいる、認知が広がらない商品がある</li>
+          <li>既存商品を、新しい客層にも広げたい</li>
+        </ul>
         <div class="choice-go">この相談で進む →</div>
       </div>
     </a>
