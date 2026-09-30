@@ -274,14 +274,6 @@
   .progress-step.done { background: var(--ink); }
 
   /* Mobile */
-  @media (max-width: 600px) {
-    header { padding: 1.25rem 1.5rem;  flex-wrap: wrap; }
-    .pr-badge { order: 3; margin-top: 0.4rem; }
-    main { padding: 2.5rem 1.25rem 4rem; }
-    .page-title { font-size: 2rem; }
-    .grid-2 { grid-template-columns: 1fr; }
-    .submit-area { flex-direction: column; gap: 1.5rem; align-items: flex-start; }
-
   /* Report preview box */
   .report-preview {
     border: 0.5px solid var(--rule);
@@ -406,6 +398,15 @@
     color: #fff;
     border-color: var(--ink);
   }
+
+  @media (max-width: 600px) {
+    header { padding: 1.25rem 1.5rem;  flex-wrap: wrap; }
+    .pr-badge { order: 3; margin-top: 0.4rem; }
+    main { padding: 2.5rem 1.25rem 4rem; }
+    .page-title { font-size: 2rem; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .submit-area { flex-direction: column; gap: 1.5rem; align-items: flex-start; }
+
 
     .submit-btn { width: 100%; text-align: center; }
   }
