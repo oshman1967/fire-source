@@ -399,6 +399,34 @@
     border-color: var(--ink);
   }
 
+
+  /* Loading spinner + hint */
+  .loading-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--rule);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: fs-spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 0.5rem;
+  }
+  @keyframes fs-spin { to { transform: rotate(360deg); } }
+  .loading-progress-row { display: flex; align-items: center; }
+  .loading-hint {
+    font-size: 0.68rem;
+    color: var(--ink-light);
+    margin-top: 0.3rem;
+    margin-left: 1.6rem;
+  }
+  #loadingError {
+    display: none;
+    font-size: 0.75rem;
+    color: var(--ink-light);
+    margin-top: 0.75rem;
+  }
+
   @media (max-width: 600px) {
     header { padding: 1.25rem 1.5rem;  flex-wrap: wrap; }
     .pr-badge { order: 3; margin-top: 0.4rem; }
@@ -570,7 +598,14 @@
 
   <p class="autosave-note">入力内容はこの端末に自動保存されます</p>
   <button id="analyzeBtn" class="submit-btn" style="border:none; cursor:pointer;">分析を開始する →</button>
-   <div id="loadingMsg" style="display:none; font-size:0.75rem; color:var(--ink-light); margin-top:0.75rem;">解析中です…(約60秒)</div>
+   <div id="loadingMsg" style="display:none; margin-top:0.75rem;">
+     <div class="loading-progress-row">
+       <span class="loading-spinner"></span>
+       <span id="loadingStageText" style="font-size:0.75rem; color:var(--ink-light);"></span>
+     </div>
+     <p class="loading-hint" id="loadingHint">通常は60秒前後で完了します</p>
+   </div>
+   <p id="loadingError"></p>
 
   <div class="modal-overlay" id="confirmModal">
     <div class="modal-box">
@@ -625,28 +660,52 @@
       if (el) el.addEventListener("input", saveDraft);
     });
 
-    // --- 待機画面の進捗表示(簡易版・タイマー式) ---
+    // --- 待機画面の進捗表示(タイマー式 + 成功/失敗で確実に停止) ---
     const progressStages = [
       "相談内容を読み取っています",
       "SNSの公開データを分析しています",
       "AIが情報を統合しています",
       "レポートを作成しています"
     ];
+    let progressTimers = [];
+
+    function clearProgressTimers() {
+      progressTimers.forEach(t => clearTimeout(t));
+      progressTimers = [];
+    }
+
+    function showProgress() {
+      document.getElementById("loadingMsg").style.display = "block";
+      document.getElementById("loadingError").style.display = "none";
+    }
+
+    function showLoadingError(message) {
+      clearProgressTimers();
+      document.getElementById("loadingMsg").style.display = "none";
+      const errEl = document.getElementById("loadingError");
+      errEl.textContent = message;
+      errEl.style.display = "block";
+    }
+
     function startProgressDisplay() {
-      let stageIndex = 0;
-      const msgEl = document.getElementById("loadingMsg");
-      msgEl.textContent = progressStages[0] + "…";
+      clearProgressTimers();
+      showProgress();
+      const stageTextEl = document.getElementById("loadingStageText");
+      const hintEl = document.getElementById("loadingHint");
+      hintEl.textContent = "通常は60秒前後で完了します";
+      stageTextEl.textContent = progressStages[0] + "…";
       const stageDurations = [4000, 14000, 20000];
       let cumulative = 0;
       stageDurations.forEach((d, i) => {
         cumulative += d;
-        setTimeout(() => {
-          if (stageIndex <= i + 1) {
-            stageIndex = i + 1;
-            msgEl.textContent = progressStages[stageIndex] + "…";
-          }
-        }, cumulative);
+        progressTimers.push(setTimeout(() => {
+          stageTextEl.textContent = progressStages[i + 1] + "…";
+        }, cumulative));
       });
+      // 想定より長引いた場合だけ、控えめな案内に切り替える
+      progressTimers.push(setTimeout(() => {
+        hintEl.textContent = "もう少しお待ちください";
+      }, 65000));
     }
 
     // --- 送信前の確認ポップアップ ---
@@ -695,8 +754,7 @@
       const values = getCurrentFormValues();
       const missing = requiredFieldsMissing(values);
       if (missing.length > 0) {
-        document.getElementById("loadingMsg").style.display = "block";
-        document.getElementById("loadingMsg").textContent = `必須項目が未入力です：${missing.join("、")}`;
+        showLoadingError(`必須項目が未入力です：${missing.join("、")}`);
         return;
       }
       document.getElementById("loadingMsg").style.display = "none";
@@ -720,7 +778,7 @@
         const files = Array.from(document.getElementById("mediaUpload").files);
         const totalSize = files.reduce((sum, f) => sum + f.size, 0);
         if (totalSize > 3 * 1024 * 1024) {
-          document.getElementById("loadingMsg").textContent = "添付資料の合計サイズが3MBを超えています。枚数を減らすか圧縮してからお試しください。";
+          showLoadingError("添付資料の合計サイズが3MBを超えています。枚数を減らすか圧縮してからお試しください。");
           btn.disabled = false;
           return;
         }
@@ -760,7 +818,7 @@
         clearDraft();
         window.location.href = "new_product_report.html";
       } catch (err) {
-        document.getElementById("loadingMsg").textContent = "エラーが発生しました。もう一度お試しください。";
+        showLoadingError("エラーが発生しました。もう一度お試しください。");
       } finally {
         btn.disabled = false;
       }
