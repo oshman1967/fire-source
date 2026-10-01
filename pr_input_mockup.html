@@ -564,8 +564,8 @@
   <div class="form-section">
     <p class="section-label">ターゲット・ご相談内容</p>
     <div class="field">
-      <label>ターゲット層<span class="req-badge">必須</span></label>
-      <textarea id="target-textarea" placeholder="例：健康意識が高く、情報感度の高いアーリーアダプター層の30代女性。"></textarea>
+      <label>商品・ターゲット層<span class="req-badge">必須</span></label>
+      <textarea id="target-textarea" placeholder="例：国産素材にこだわったオーガニック石鹸。健康意識が高く、情報感度の高いアーリーアダプター層の30代女性向け。"></textarea>
     </div>
     <div class="field" style="margin-top:1rem">
       <label>ご相談したい内容<span class="req-badge">必須</span></label>
@@ -753,7 +753,7 @@
           ["目的", values.purpose || "（未入力）"],
           ["価格帯", values.price || "（未入力）"],
           ["月間PR予算", values.budget || "（未入力）"],
-          ["ターゲット層", values.targetLayer || "（未入力）"],
+          ["商品・ターゲット層", values.targetLayer || "（未入力）"],
           ["ご相談したい内容", values.notes || "（未入力）"],
         ];
         if (values.lot) rows.push(["月間生産ロット", values.lot]);
@@ -774,7 +774,7 @@
         if (!values.category) missing.push("商品カテゴリ");
         if (!values.purpose) missing.push("目的");
         if (!values.price) missing.push("価格帯");
-        if (!values.targetLayer) missing.push("ターゲット層");
+        if (!values.targetLayer) missing.push("商品・ターゲット層");
         if (!values.notes) missing.push("ご相談したい内容");
         return missing;
       }
