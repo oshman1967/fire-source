@@ -499,6 +499,51 @@
     margin-bottom: 0.5rem;
   }
 
+
+  /* Score criteria legend (collapsible) */
+  .criteria-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.9rem;
+    font-size: 0.72rem;
+    color: #bbb;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: 'Noto Sans JP', sans-serif;
+    padding: 0;
+  }
+  .criteria-toggle:hover { color: #fff; }
+  .criteria-toggle .arrow { transition: transform 0.2s; display: inline-block; }
+  .criteria-toggle.open .arrow { transform: rotate(90deg); }
+  .criteria-legend {
+    display: none;
+    margin-top: 0.9rem;
+    border-top: 0.5px solid #444;
+    padding-top: 0.9rem;
+  }
+  .criteria-legend.open { display: block; }
+  .criteria-legend-row { margin-bottom: 0.8rem; }
+  .criteria-legend-row:last-child { margin-bottom: 0; }
+  .criteria-legend-row h4 {
+    font-size: 0.75rem;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+  }
+  .criteria-legend-row p {
+    font-size: 0.72rem;
+    line-height: 1.7;
+    color: #ccc;
+    margin-bottom: 0.2rem;
+  }
+  .criteria-legend-row p span.grade-letter {
+    color: #fff;
+    font-weight: 600;
+    margin-right: 0.3rem;
+  }
+
   @media (max-width: 640px) {
     header { padding: 1.25rem 1.5rem;  flex-wrap: wrap; }
     .pr-badge { order: 3; margin-top: 0.4rem; }
@@ -605,6 +650,29 @@
       <h2 id="verdict-title">商品を持たないことが弱みではなく、資産が眠っている状態です。</h2>
       <p id="verdict-body">御社が本当に持っているのは商品ではなく、「どれが本当に良いかを見分けてきた目利き」と「なぜそれが良いかを説明できる現地知識」です。輸入販売ではこれが仕入れ判断という社内利用に留まり、利益になっていません。ここが頭打ちの構造的な原因です。</p>
       <div class="score-breakdown" id="score-breakdown"></div>
+      <button type="button" class="criteria-toggle" id="criteriaToggle">
+        <span class="arrow">▶</span>評価基準を見る
+      </button>
+      <div class="criteria-legend" id="criteriaLegend">
+        <div class="criteria-legend-row">
+          <h4>火種(商品・企画の独自性)</h4>
+          <p><span class="grade-letter">A</span>他社が容易に真似できない独自性があり、話題になる具体的なフックがある</p>
+          <p><span class="grade-letter">B</span>一定の独自性はあるが差別化が伝わりにくい、または伸びしろがある</p>
+          <p><span class="grade-letter">C</span>既存カテゴリの一般的な訴求に留まり、差別化の軸が定まっていない</p>
+        </div>
+        <div class="criteria-legend-row">
+          <h4>場所(発見層となるクラスタの的確さ)</h4>
+          <p><span class="grade-letter">A</span>発見層となるクラスタが具体的に特定でき、そこに火をつければ自然に広がる熱量が見込める</p>
+          <p><span class="grade-letter">B</span>クラスタは特定できるが規模が小さい、または発見層でなく消費者層止まりになりやすい</p>
+          <p><span class="grade-letter">C</span>ターゲットが曖昧なくくりに留まり、特定のクラスタまで絞り込めていない</p>
+        </div>
+        <div class="criteria-legend-row">
+          <h4>燃料(広め方の実行しやすさ)</h4>
+          <p><span class="grade-letter">A</span>申告された予算規模に対して、火種・場所に合った施策が無理なく描ける</p>
+          <p><span class="grade-letter">B</span>実行はできるが予算と施策の規模感に無理がある</p>
+          <p><span class="grade-letter">C</span>予算では想定する施策の実行規模に届かない、または有効な施策の当てがない</p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -875,6 +943,16 @@
       .map(na => `<li>${na.text}</li>`)
       .join("");
   }
+})();
+
+(function() {
+  const toggle = document.getElementById("criteriaToggle");
+  const legend = document.getElementById("criteriaLegend");
+  if (!toggle || !legend) return;
+  toggle.addEventListener("click", () => {
+    const isOpen = legend.classList.toggle("open");
+    toggle.classList.toggle("open", isOpen);
+  });
 })();
 </script>
 
