@@ -71,7 +71,7 @@ export default async function handler(req, res) {
           const rawItems = await apifyRes.json();
           const items = (Array.isArray(rawItems) ? rawItems : []).filter(it => it && !it.error && it.url);
           if (items.length > 0) {
-            snsNote = `\n\n[SNS実データ確認] #${keyword} のInstagram投稿が実際に確認できました。この事実を踏まえ、verdict.bodyかsignalsのいずれか一箇所に、誇張しない一文で「Instagramでも話題になり始めています」のような形で自然に触れてください。具体的な件数や「バズっている」等の誇張表現は使わないこと。該当する投稿が確認できなかった場合はこの言及自体を省略してください。`;
+            snsNote = `\n\n[SNS実データ確認] #${keyword} のSNS投稿が実際に確認できました。この事実を踏まえ、verdict.bodyかwarningsのいずれか一箇所に、誇張しない一文で「SNSでも#${keyword}の投稿が見られます」のような形で自然に触れてください。媒体名(Instagram等)は出さず「SNS」と表現すること。具体的な件数や「バズっている」等の誇張表現は使わないこと。該当する投稿が確認できなかった場合はこの言及自体を省略してください。`;
 
             // --- コメントの軽量チェック(上位2投稿×各10件) ---
             try {
