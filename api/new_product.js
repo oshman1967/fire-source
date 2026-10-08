@@ -328,7 +328,8 @@ userMessageの末尾に「Haikuが抽出した検索キーワード候補」が�
       },
       body: JSON.stringify({
         model: "claude-sonnet-5-5",
-        max_tokens: 4000,
+        max_tokens: 16000,
+        output_config: { effort: "medium" },
         system: systemPrompt,
         messages: [{ role: "user", content: userContent }],
       }),
