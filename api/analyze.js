@@ -364,7 +364,8 @@ userMessageの末尾に「Haikuが抽出した検索キーワード候補」が�
       },
       body: JSON.stringify({
         model: "claude-sonnet-5-5",
-        max_tokens: 3000,
+        max_tokens: 16000,
+        output_config: { effort: "medium" },
         system: systemPrompt,
         messages: [{ role: "user", content: userContent }],
       }),
@@ -392,7 +393,7 @@ userMessageの末尾に「Haikuが抽出した検索キーワード候補」が�
         imageUrls.join(", "),
       ]);
     };
-    const rawText = data.content?.[0]?.text;
+    const rawText = data.content?.find(b => b.type === "text")?.text;
     if (!response.ok || !rawText) {
       await recordFailure(data.error?.message || `HTTP ${response.status}`);
       return res.status(502).json({ error: "分析中にエラーが発生しました" });
@@ -412,7 +413,7 @@ userMessageの末尾に「Haikuが抽出した検索キーワード候補」が�
       try {
         const retryRes = await callClaude();
         const retryData = await retryRes.json();
-        const retryText = retryData.content?.[0]?.text;
+        const retryText = retryData.content?.find(b => b.type === "text")?.text;
         if (retryRes.ok && retryText) {
           const retryReport = JSON.parse(retryText.replace(/```json|```/g, "").trim());
           if (!hasHangul(retryReport)) report = retryReport;
