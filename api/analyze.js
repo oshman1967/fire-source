@@ -29,7 +29,7 @@ export default async function handler(req, res) {
               "anthropic-version": "2023-06-01",
             },
             body: JSON.stringify({
-              model: "claude-haiku-5-5",
+              model: "claude-haiku-4-5-20251001",
               max_tokens: 40,
               system: "あなたはSNS検索キーワードの選定担当です。以下の商品相談内容から、Instagramで実際にハッシュタグとして使われていそうな、最も的確な日本語キーワードを、有望だと思う順に3つ出力してください。商品カテゴリそのものではなく、相談者が本当に狙っている方向性(ターゲット層・訴求軸)を優先してください。出力はキーワード3つのみ、カンマ区切りで、説明や記号は一切付けないこと。例:艶感,韓国コスメ,発色",
               messages: [{
@@ -363,9 +363,8 @@ userMessageの末尾に「Haikuが抽出した検索キーワード候補」が�
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-5-5",
+        model: "claude-sonnet-4-6",
         max_tokens: 16000,
-        output_config: { effort: "medium" },
         system: systemPrompt,
         messages: [{ role: "user", content: userContent }],
       }),
